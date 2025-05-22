@@ -410,11 +410,6 @@
                 </div>
 
                 <div class="info-item">
-                    <div class="item-label">Workflow</div>
-                    <div class="item-value"><a href="#" target="_blank" id="workflow"></a></div>
-                </div>
-
-                <div class="info-item">
                     <div class="item-label">Runner</div>
                     <div class="item-value" id="runner"></div>
                 </div>
@@ -422,6 +417,11 @@
                 <div class="info-item">
                     <div class="item-label">Timestamp</div>
                     <div class="item-value" id="timestamp"></div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Workflow</div>
+                    <div class="item-value"><a href="#" target="_blank" id="workflow"></a></div>
                 </div>
             </div>
         </div>
@@ -431,18 +431,13 @@
             <h3 class="section-title">Project Information</h3>
             <div class="info-list">
                 <div class="info-item">
-                    <div class="item-label">Project ID</div>
+                    <div class="item-label">Project Id</div>
                     <div class="item-value" id="project-id"></div>
                 </div>
 
                 <div class="info-item">
-                    <div class="item-label">Application ID</div>
+                    <div class="item-label">Application Id</div>
                     <div class="item-value" id="application-id"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Application IDIP</div>
-                    <div class="item-value" id="application-idip"></div>
                 </div>
 
                 <div class="info-item">
@@ -499,6 +494,11 @@
                     <div class="item-label">Deployments (TeamCity)</div>
                     <div class="item-value"><a href="#" target="_blank" id="team-city"></a></div>
                 </div>
+
+                <div class="info-item">
+                    <div class="item-label">Configuration Management (IDIP)</div>
+                    <div class="item-value"><a href="#" target="_blank" id="application-idip"></a></div>
+                </div>
             </div>
         </div>
 
@@ -512,7 +512,7 @@
 
     <!-- Footer -->
     <div class="report-footer">
-        Generated on <span id="generation-date"></span>
+        Footer
     </div>
 </div>
 
@@ -623,9 +623,6 @@
                 teamCityEl.textContent = data.team_city;
                 teamCityEl.href = `https://teamcity.example.com/project/${data.team_city}`;
             }
-
-            // Update generation date
-            document.getElementById('generation-date').textContent = data.generation_time || new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
 
             // Update artifacts
             if (data.artifacts && data.artifacts.length > 0) {
