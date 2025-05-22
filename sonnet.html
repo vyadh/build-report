@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Build Report</title>
+    <style>
+        /* Root variables for theming */
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #252525;
+            --bg-tertiary: #2d2d2d;
+            --accent-primary: #6272a4;
+            --accent-secondary: #bd93f9;
+            --text-primary: #f8f8f2;
+            --text-secondary: #b3b3b3;
+            --text-muted: #8c8c8c;
+            --border-color: #3d3d3d;
+            --success: #50fa7b;
+            --warning: #ffb86c;
+            --danger: #ff5555;
+            --info: #8be9fd;
+
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --border-radius: 8px;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+        }
+
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Build report container */
+        .build-report {
+            border-radius: var(--border-radius);
+            background-color: var(--bg-primary);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin: var(--spacing-lg);
+            max-width: 1200px;
+            position: relative;
+        }
+
+        /* Header with gradient */
+        .report-header {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--text-primary);
+            padding: var(--spacing-lg);
+            position: relative;
+        }
+
+        .report-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .report-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: var(--spacing-sm);
+        }
+
+        .badge-primary {
+            background-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .badge-secondary {
+            background-color: var(--accent-secondary);
+            color: var(--bg-primary);
+        }
+
+        .badge-success {
+            background-color: var(--success);
+            color: var(--bg-primary);
+        }
+
+        .badge-warning {
+            background-color: var(--warning);
+            color: var(--bg-primary);
+        }
+
+        /* Build info sections */
+        .report-body {
+            padding: var(--spacing-lg);
+        }
+
+        .info-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--accent-secondary);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-xs);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Info grid for multiple columns */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        /* Cards for prominent information */
+        .info-card {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+
+        .info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .card-value {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+            word-break: break-word;
+        }
+
+        /* Item rows for regular information */
+        .info-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .info-item {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .item-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .item-value {
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+
+        /* Links styling */
+        a {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--info);
+            text-decoration: underline;
+        }
+
+        /* Artifacts section */
+        .artifacts-container {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .artifacts-title {
+            color: var(--accent-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .artifacts-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .artifact-item {
+            background-color: var(--bg-tertiary);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .artifact-item:hover {
+            transform: translateY(-2px);
+            background-color: var(--bg-secondary);
+        }
+
+        .artifact-icon {
+            margin-right: var(--spacing-sm);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-secondary);
+        }
+
+        .artifact-info {
+            flex-grow: 1;
+        }
+
+        .artifact-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .artifact-type {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Footer */
+        .report-footer {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Responsive media queries */
+        @media (max-width: 768px) {
+            .build-report {
+                margin: var(--spacing-sm);
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-list {
+                grid-template-columns: 1fr;
+            }
+
+            .artifacts-list {
+                grid-template-columns: 1fr;
+            }
+
+            .report-header {
+                padding: var(--spacing-md);
+            }
+
+            .report-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Icons */
+        .material-icons {
+            vertical-align: middle;
+            font-size: 20px;
+        }
+
+        .icon-small {
+            font-size: 16px;
+        }
+
+        /* Tag list */
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-xs);
+        }
+
+        .tag {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-radius: 16px;
+            padding: 2px 10px;
+            font-size: 0.75rem;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+<div class="build-report">
+    <!-- Header Section -->
+    <div class="report-header">
+        <div class="report-title">
+            <span id="project-name">Hello World</span>
+            <span class="badge badge-primary" id="project-type">API</span>
+            <span class="badge badge-secondary" id="project-maturity">Snapshot</span>
+        </div>
+        <div class="report-subtitle">
+            <span id="application-name">Samples</span> /
+            <span id="repository"><a href="#" target="_blank">dpe-hello-world</a></span>
+        </div>
+    </div>
+
+    <!-- Body Section -->
+    <div class="report-body">
+        <!-- Prominent Information Cards -->
+        <div class="info-section">
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="card-label">Version</div>
+                    <div class="card-value"><a href="#" target="_blank" id="version">1.2.3</a></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-label">Build Reference</div>
+                    <div class="card-value"><a href="#" target="_blank" id="build-reference">111122233.1.2</a></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-label">Branch</div>
+                    <div class="card-value" id="branch">main</div>
+                    <div><span class="badge badge-success">Protected</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Information -->
+        <div class="info-section">
+            <h3 class="section-title">Project Information</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="item-label">Project ID</div>
+                    <div class="item-value" id="project-id">hello-world</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Project Code</div>
+                    <div class="item-value" id="project-code">hello</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Project Description</div>
+                    <div class="item-value" id="project-description">The hello world service</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Application ID</div>
+                    <div class="item-value" id="application-id">samples</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Application IDIP</div>
+                    <div class="item-value" id="application-idip">SAMPLES</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Information -->
+        <div class="info-section">
+            <h3 class="section-title">Team & Organization</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="item-label">Team</div>
+                    <div class="item-value"><a href="#" target="_blank" id="team-code">DPE</a> (<span id="team-slug">development-platform-engineering</span>)</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Organisation</div>
+                    <div class="item-value"><a href="#" target="_blank" id="organisation">myorg</a></div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Collaborators</div>
+                    <div class="item-value" id="collaborators">development-platform-engineering</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Build & Platform Information -->
+        <div class="info-section">
+            <h3 class="section-title">Build Information</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="item-label">Revision</div>
+                    <div class="item-value"><a href="#" target="_blank" id="revision">84a3df9</a></div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Actor</div>
+                    <div class="item-value" id="actor">mylogin</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Workflow</div>
+                    <div class="item-value"><a href="#" target="_blank" id="workflow">build.yml</a></div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Runner</div>
+                    <div class="item-value" id="runner">org-runner-2</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Timestamp</div>
+                    <div class="item-value" id="timestamp">2025-05-22T05:14:32Z</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Information -->
+        <div class="info-section">
+            <h3 class="section-title">Technology Stack</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="item-label">Platform</div>
+                    <div class="item-value" id="platform">Java</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Languages</div>
+                    <div class="item-value">
+                        <div class="tag-list" id="languages">
+                            <span class="tag">Java</span>
+                            <span class="tag">Dockerfile</span>
+                            <span class="tag">Shell</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Build System</div>
+                    <div class="item-value" id="build-system">gradle</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Delivery</div>
+                    <div class="item-value" id="delivery">Kubernetes (Helm) [namespace]</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Information -->
+        <div class="info-section">
+            <h3 class="section-title">Integration & Management</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="item-label">Issue Tracking</div>
+                    <div class="item-value"><a href="#" target="_blank" id="issue-tracking">HLO</a></div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Change Management</div>
+                    <div class="item-value"><a href="#" target="_blank" id="change-management">HelloWorld</a></div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">TeamCity</div>
+                    <div class="item-value"><a href="#" target="_blank" id="team-city">Apps_DPE_HelloWorld</a></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Artifacts Section -->
+        <div class="artifacts-container">
+            <h3 class="artifacts-title">Build Artifacts</h3>
+            <div class="artifacts-list">
+                <a href="#" class="artifact-item">
+                    <div class="artifact-icon">
+                        <span class="material-icons">code</span>
+                    </div>
+                    <div class="artifact-info">
+                        <div class="artifact-name">hello-world-1.2.3.jar</div>
+                        <div class="artifact-type">JAR</div>
+                    </div>
+                </a>
+
+                <a href="#" class="artifact-item">
+                    <div class="artifact-icon">
+                        <span class="material-icons">description</span>
+                    </div>
+                    <div class="artifact-info">
+                        <div class="artifact-name">hello-world-1.2.3-javadoc.jar</div>
+                        <div class="artifact-type">Documentation</div>
+                    </div>
+                </a>
+
+                <a href="#" class="artifact-item">
+                    <div class="artifact-icon">
+                        <span class="material-icons">source</span>
+                    </div>
+                    <div class="artifact-info">
+                        <div class="artifact-name">hello-world-1.2.3-sources.jar</div>
+                        <div class="artifact-type">Source</div>
+                    </div>
+                </a>
+
+                <a href="#" class="artifact-item">
+                    <div class="artifact-icon">
+                        <span class="material-icons">image</span>
+                    </div>
+                    <div class="artifact-info">
+                        <div class="artifact-name">hello-world:1.2.3</div>
+                        <div class="artifact-type">Docker Image</div>
+                    </div>
+                </a>
+
+                <a href="#" class="artifact-item">
+                    <div class="artifact-icon">
+                        <span class="material-icons">insert_chart</span>
+                    </div>
+                    <div class="artifact-info">
+                        <div class="artifact-name">hello-world-1.2.3.tgz</div>
+                        <div class="artifact-type">Helm Chart</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="report-footer">
+        Generated on <span id="generation-date">2025-05-22 06:26:09 UTC</span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to update the report with data
+        function updateReportData(data) {
+            // Update project information
+            if (data.projectId) document.getElementById('project-id').textContent = data.projectId;
+            if (data.projectName) document.getElementById('project-name').textContent = data.projectName;
+            if (data.projectDescription) document.getElementById('project-description').textContent = data.projectDescription;
+            if (data.projectCode) document.getElementById('project-code').textContent = data.projectCode;
+            if (data.projectType) document.getElementById('project-type').textContent = data.projectType;
+
+            // Update application information
+            if (data.applicationId) document.getElementById('application-id').textContent = data.applicationId;
+            if (data.applicationName) document.getElementById('application-name').textContent = data.applicationName;
+            if (data.applicationIdip) document.getElementById('application-idip').textContent = data.applicationIdip;
+
+            // Update team and organization information
+            if (data.teamCode) {
+                const teamCodeEl = document.getElementById('team-code');
+                teamCodeEl.textContent = data.teamCode;
+                teamCodeEl.href = `https://github.com/orgs/${data.organisation}/teams/${data.teamSlug}`;
+            }
+            if (data.teamSlug) document.getElementById('team-slug').textContent = data.teamSlug;
+            if (data.organisation) {
+                const orgEl = document.getElementById('organisation');
+                orgEl.textContent = data.organisation;
+                orgEl.href = `https://github.com/${data.organisation}`;
+            }
+            if (data.repository) {
+                const repoEl = document.getElementById('repository');
+                repoEl.textContent = data.repository;
+                repoEl.href = `https://github.com/${data.organisation}/${data.repository}`;
+            }
+            if (data.collaborators) document.getElementById('collaborators').textContent = data.collaborators;
+
+            // Update build information
+            if (data.version) {
+                const versionEl = document.getElementById('version');
+                versionEl.textContent = data.version;
+                versionEl.href = `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}`;
+                // Hide if not a release build
+                if (!data.version) {
+                    versionEl.parentElement.parentElement.style.display = 'none';
+                }
+            }
+            if (data.buildReference) {
+                const buildRefEl = document.getElementById('build-reference');
+                buildRefEl.textContent = data.buildReference;
+                buildRefEl.href = `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.buildReference.split('.')[0]}`;
+            }
+            if (data.branch) document.getElementById('branch').textContent = data.branch;
+            if (data.revision) {
+                const revisionEl = document.getElementById('revision');
+                revisionEl.textContent = data.revision.substring(0, 7);
+                revisionEl.href = `https://github.com/${data.organisation}/${data.repository}/commit/${data.revision}`;
+            }
+            if (data.actor) document.getElementById('actor').textContent = data.actor;
+            if (data.workflow) {
+                const workflowEl = document.getElementById('workflow');
+                workflowEl.textContent = data.workflow;
+                workflowEl.href = `https://github.com/${data.organisation}/${data.repository}/blob/main/.github/workflows/${data.workflow}`;
+            }
+            if (data.runner) document.getElementById('runner').textContent = data.runner;
+            if (data.timestamp) document.getElementById('timestamp').textContent = data.timestamp;
+            if (data.maturity) document.getElementById('project-maturity').textContent = data.maturity;
+
+            // Update technology information
+            if (data.platform) document.getElementById('platform').textContent = data.platform;
+            if (data.languages) {
+                const langContainer = document.getElementById('languages');
+                langContainer.innerHTML = '';
+                data.languages.split(', ').forEach(lang => {
+                    const tagSpan = document.createElement('span');
+                    tagSpan.className = 'tag';
+                    tagSpan.textContent = lang;
+                    langContainer.appendChild(tagSpan);
+                });
+            }
+            if (data.buildSystem) document.getElementById('build-system').textContent = data.buildSystem;
+            if (data.delivery) document.getElementById('delivery').textContent = data.delivery;
+
+            // Update integration information
+            if (data.issueTracking) {
+                const issueTrackingEl = document.getElementById('issue-tracking');
+                issueTrackingEl.textContent = data.issueTracking;
+                issueTrackingEl.href = `https://jira.example.com/projects/${data.issueTracking}`;
+            }
+            if (data.changeManagement) {
+                const changeManagementEl = document.getElementById('change-management');
+                changeManagementEl.textContent = data.changeManagement;
+                changeManagementEl.href = `https://servicenow.example.com/item/${data.changeManagement}`;
+            }
+            if (data.teamCity) {
+                const teamCityEl = document.getElementById('team-city');
+                teamCityEl.textContent = data.teamCity;
+                teamCityEl.href = `https://teamcity.example.com/project/${data.teamCity}`;
+            }
+
+            // Update generation date
+            document.getElementById('generation-date').textContent = data.generationTime || new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+
+            // Update artifacts
+            if (data.artifacts && data.artifacts.length > 0) {
+                const artifactsContainer = document.querySelector('.artifacts-list');
+                artifactsContainer.innerHTML = ''; // Clear existing artifacts
+
+                data.artifacts.forEach(artifact => {
+                    const artifactItem = document.createElement('a');
+                    artifactItem.href = artifact.url;
+                    artifactItem.className = 'artifact-item';
+                    artifactItem.target = '_blank'; // Open in new tab
+
+                    const artifactIcon = document.createElement('div');
+                    artifactIcon.className = 'artifact-icon';
+                    artifactIcon.innerHTML = `<span class="material-icons">${artifact.icon || 'file_present'}</span>`;
+
+                    const artifactInfo = document.createElement('div');
+                    artifactInfo.className = 'artifact-info';
+
+                    const artifactName = document.createElement('div');
+                    artifactName.className = 'artifact-name';
+                    artifactName.textContent = artifact.name;
+
+                    const artifactType = document.createElement('div');
+                    artifactType.className = 'artifact-type';
+                    artifactType.textContent = artifact.type;
+
+                    artifactInfo.appendChild(artifactName);
+                    artifactInfo.appendChild(artifactType);
+
+                    artifactItem.appendChild(artifactIcon);
+                    artifactItem.appendChild(artifactInfo);
+
+                    artifactsContainer.appendChild(artifactItem);
+                });
+            }
+        }
+
+        // Fetch the JSON data from the file
+        fetch('build-report-data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateReportData(data);
+            })
+            .catch(error => {
+                console.error('Error loading build report data:', error);
+            });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Build Report</title>
+    <style>
+        :root {
+            --primary-bg-color: #1e1e1e;
+            --secondary-bg-color: #2a2a2a;
+            --tertiary-bg-color: #333333;
+            --primary-text-color: #e0e0e0;
+            --secondary-text-color: #b0b0b0;
+            --accent-color: #00aaff;
+            --link-color: #00aaff;
+            --link-hover-color: #0088cc;
+            --border-color: #444444;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --warning-color: #ffc107;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --card-padding: 20px;
+            --card-border-radius: 8px;
+            --section-spacing: 25px;
+        }
+
+        body.build-report-body {
+            background-color: var(--primary-bg-color);
+            color: var(--primary-text-color);
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .build-report-container {
+            background-color: var(--secondary-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-border-radius);
+            padding: var(--card-padding);
+            margin: 20px; /* Provides spacing if embedded directly on a similar bg */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: var(--section-spacing);
+            padding-bottom: var(--section-spacing);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .report-header h1 {
+            font-size: 2.5em;
+            color: var(--accent-color);
+            margin: 0 0 10px 0;
+        }
+
+        .report-header .app-name {
+            font-size: 1.8em;
+            color: var(--primary-text-color);
+            margin-top: 0;
+        }
+
+        .report-section {
+            margin-bottom: var(--section-spacing);
+            background-color: var(--tertiary-bg-color);
+            padding: var(--card-padding);
+            border-radius: var(--card-border-radius);
+        }
+
+        .report-section h2 {
+            font-size: 1.5em;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .property-item {
+            background-color: var(--secondary-bg-color);
+            padding: 15px;
+            border-radius: var(--card-border-radius);
+            border: 1px solid var(--border-color);
+            word-break: break-word; /* Prevents long strings from breaking layout */
+        }
+
+        .property-item strong {
+            display: block;
+            color: var(--primary-text-color);
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .property-item span, .property-item a {
+            color: var(--secondary-text-color);
+            font-size: 0.9em;
+        }
+
+        .property-item a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .property-item a:hover {
+            color: var(--link-hover-color);
+            text-decoration: underline;
+        }
+
+        .prominent {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-text-color);
+        }
+
+        .optional-item {
+            opacity: 0.8;
+        }
+
+        .status-protected {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+        .status-unprotected {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+
+        .artefacts-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .artefacts-list li {
+            background-color: var(--secondary-bg-color);
+            padding: 10px 15px;
+            border-radius: var(--card-border-radius);
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .artefacts-list .artefact-name {
+            font-weight: bold;
+            color: var(--primary-text-color);
+        }
+        .artefacts-list .artefact-type {
+            font-style: italic;
+            color: var(--secondary-text-color);
+            margin-left: 10px;
+        }
+        .artefacts-list a {
+            color: var(--link-color);
+            text-decoration: none;
+            margin-left: auto; /* Pushes link to the right */
+            padding-left: 15px; /* Space before link */
+        }
+        .artefacts-list a:hover {
+            color: var(--link-hover-color);
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .report-header h1 {
+                font-size: 2em;
+            }
+            .report-header .app-name {
+                font-size: 1.5em;
+            }
+            .grid-container {
+                grid-template-columns: 1fr; /* Stack items on smaller screens */
+            }
+            .artefacts-list li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .artefacts-list a {
+                margin-left: 0;
+                margin-top: 5px;
+                padding-left: 0;
+            }
+        }
+
+        /* Ensure self-contained visual distinctness */
+        .build-report-container.embedded {
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.2); /* Subtle glow in accent color */
+            border: 1px solid var(--accent-color);
+        }
+
+    </style>
+</head>
+<body class="build-report-body">
+
+<div class="build-report-container embedded"> <header class="report-header">
+    <h1><span id="projectName">Hello World</span></h1>
+    <p class="app-name"><span id="applicationName">Samples</span></p>
+    <p class="optional-item" id="projectDescriptionContainer" style="display: none;">
+        Description: <span id="projectDescription">The hello world service</span>
+    </p>
+</header>
+
+    <section class="report-section">
+        <h2>Build & Version</h2>
+        <div class="grid-container">
+            <div class="property-item">
+                <strong>Build Reference:</strong>
+                <a href="#" id="buildReferenceLink" target="_blank" class="prominent"><span id="buildReference">111122233.1.2</span></a>
+            </div>
+            <div class="property-item" id="versionContainer" style="display: none;"> <strong>Version:</strong>
+                <a href="#" id="versionLink" target="_blank" class="prominent"><span id="version">1.2.3</span></a>
+            </div>
+            <div class="property-item">
+                <strong>Timestamp:</strong>
+                <span id="timestamp">2025-05-22T09:30:00Z</span>
+            </div>
+            <div class="property-item">
+                <strong>Maturity:</strong>
+                <span id="maturity">Snapshot</span>
+            </div>
+            <div class="property-item">
+                <strong>Type:</strong>
+                <span id="type" class="prominent">API</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="report-section">
+        <h2>Source & Workflow</h2>
+        <div class="grid-container">
+            <div class="property-item">
+                <strong>Repository:</strong>
+                <a href="#" id="repositoryLink" target="_blank" class="prominent"><span id="repository">dpe-hello-world</span></a>
+            </div>
+            <div class="property-item">
+                <strong>Branch:</strong>
+                <span id="branch">main</span>
+                (<span id="protectedBranch" class="status-protected">Yes</span>)
+            </div>
+            <div class="property-item">
+                <strong>Revision:</strong>
+                <a href="#" id="revisionLink" target="_blank"><span id="revision">abcdef1234567890</span></a>
+            </div>
+            <div class="property-item">
+                <strong>Workflow:</strong>
+                <a href="#" id="workflowLink" target="_blank"><span id="workflow">build-and-deploy.yml</span></a>
+            </div>
+            <div class="property-item">
+                <strong>Actor:</strong>
+                <span id="actor">mylogin</span>
+            </div>
+            <div class="property-item">
+                <strong>Runner:</strong>
+                <span id="runner">org-runner-2</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="report-section">
+        <h2>Project Details</h2>
+        <div class="grid-container">
+            <div class="property-item">
+                <strong>Project ID:</strong>
+                <span id="projectId">hello-world</span>
+            </div>
+            <div class="property-item optional-item" id="projectCodeContainer" style="display: none;">
+                <strong>Project Code:</strong>
+                <span id="projectCode">hello</span>
+            </div>
+            <div class="property-item">
+                <strong>Application ID:</strong>
+                <span id="applicationId">samples</span>
+            </div>
+            <div class="property-item optional-item" id="applicationIDIPContainer" style="display: none;"> <strong>Application IDIP:</strong>
+                <span id="applicationIDIP">SAMPLES</span>
+            </div>
+            <div class="property-item optional-item" id="platformContainer" style="display: none;">
+                <strong>Platform:</strong>
+                <span id="platform">Java</span>
+            </div>
+            <div class="property-item optional-item" id="languagesContainer" style="display: none;"> <strong>Languages:</strong>
+                <span id="languages">Java, Dockerfile, Shell</span>
+            </div>
+            <div class="property-item optional-item" id="buildSystemContainer" style="display: none;"> <strong>Build System:</strong>
+                <span id="buildSystem">gradle</span>
+            </div>
+            <div class="property-item optional-item" id="deliveryContainer" style="display: none;"> <strong>Delivery:</strong>
+                <span id="delivery">Kubernetes (Helm) [namespace]</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="report-section">
+        <h2>Team & Organisation</h2>
+        <div class="grid-container">
+            <div class="property-item">
+                <strong>Organisation:</strong>
+                <a href="#" id="organisationLink" target="_blank"><span id="organisation">myorg</span></a>
+            </div>
+            <div class="property-item">
+                <strong>Team:</strong>
+                <a href="#" id="teamLink" target="_blank"><span id="teamCode">DPE</span></a> (<span id="teamSlug">development-platform-engineering</span>)
+            </div>
+            <div class="property-item">
+                <strong>Collaborators:</strong>
+                <span id="collaborators">development-platform-engineering, another-team</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="report-section" id="integrationsSection" style="display: none;">
+        <h2>Integrations</h2>
+        <div class="grid-container">
+            <div class="property-item optional-item" id="issueTrackingContainer" style="display: none;"> <strong>Issue Tracking (Jira):</strong>
+                <a href="#" id="issueTrackingLink" target="_blank"><span id="issueTracking">HLO</span></a>
+            </div>
+            <div class="property-item optional-item" id="changeManagementContainer" style="display: none;"> <strong>Change Management (ServiceNow):</strong>
+                <a href="#" id="changeManagementLink" target="_blank"><span id="changeManagement">HelloWorld</span></a>
+            </div>
+            <div class="property-item optional-item" id="teamCityContainer" style="display: none;">
+                <strong>TeamCity Project:</strong>
+                <a href="#" id="teamCityLink" target="_blank"><span id="teamCity">Apps_DPE_HelloWorld</span></a>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="report-section">
+        <h2>Build Artefacts</h2>
+        <ul class="artefacts-list" id="artefactsList">
+            <li>
+                <span class="artefact-name">hello-world-1.2.3.jar</span>
+                <span class="artefact-type">(Java Archive)</span>
+                <a href="#">Download/View</a>
+            </li>
+            <li>
+                <span class="artefact-name">Dockerfile</span>
+                <span class="artefact-type">(Docker Instruction File)</span>
+                <a href="#">Download/View</a>
+            </li>
+            <li>
+                <span class="artefact-name">coverage-report.html</span>
+                <span class="artefact-type">(HTML Report)</span>
+                <a href="#">Download/View</a>
+            </li>
+        </ul>
+    </section>
+
+</div>
+
+<script>
+    // Basic script to handle optional field visibility and dynamic content
+    // In a real scenario, you'd populate this data from a backend or build script.
+    document.addEventListener('DOMContentLoaded', function() {
+        const exampleData = {
+            projectId: "hello-world",
+            projectName: "Hello World",
+            projectDescription: "The hello world service demonstrating various CI/CD capabilities.", // Example with a slightly longer description
+            projectCode: "hello",
+            applicationId: "samples",
+            applicationName: "Samples Platform",
+            applicationIDIP: "SAMPLES",
+            teamCode: "DPE",
+            teamSlug: "development-platform-engineering",
+            organisation: "myorg",
+            repository: "dpe-hello-world",
+            collaborators: "development-platform-engineering, user-a, user-b",
+            version: "1.2.3", // Set to null or undefined to hide version
+            buildReference: "refs/runs/111122233.1.2",
+            branch: "feature/new-ui",
+            protectedBranch: "No", // Or "Yes"
+            revision: "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+            actor: "jane.doe",
+            workflow: "main-ci.yml",
+            runner: "gh-runner-large-m1",
+            timestamp: new Date().toISOString(), // Current time as example
+            maturity: "Release Candidate",
+            platform: "Java",
+            languages: "Java, Dockerfile, Shell, Groovy",
+            buildSystem: "Gradle",
+            type: "Microservice API",
+            delivery: "Kubernetes (Helm) [prod-cluster/app-namespace]",
+            issueTracking: "PROJ-123",
+            changeManagement: "CHG000789",
+            teamCity: "Apps_DPE_HelloWorld_Release",
+            artefacts: [
+                { name: "app-service-1.2.3.jar", type: "Executable JAR", link: "#artefact1" },
+                { name: "deploy-script.sh", type: "Shell Script", link: "#artefact2" },
+                { name: "README.md", type: "Documentation", link: "#artefact3" }
+            ]
+        };
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el && value !== null && value !== undefined) el.textContent = value;
+        }
+
+        function setLink(id, href, text) {
+            const el = document.getElementById(id);
+            if (el && href !== null && href !== undefined) {
+                el.href = href;
+                if (text !== null && text !== undefined) el.textContent = text;
+            }
+        }
+
+        function setVisibility(containerId, data) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                if (data !== null && data !== undefined && String(data).trim() !== "") {
+                    container.style.display = ''; // Show if data exists
+                    return true;
+                } else {
+                    container.style.display = 'none'; // Hide if no data
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // --- Populate Header ---
+        setText('projectName', exampleData.projectName);
+        setText('applicationName', exampleData.applicationName);
+        if (setVisibility('projectDescriptionContainer', exampleData.projectDescription)) {
+            setText('projectDescription', exampleData.projectDescription);
+        }
+
+        // --- Populate Build & Version ---
+        setText('buildReference', exampleData.buildReference);
+        setLink('buildReferenceLink', `https://github.com/${exampleData.organisation}/${exampleData.repository}/actions/runs/${exampleData.buildReference.split('/').pop()}`, exampleData.buildReference); // Example GitHub Actions link
+
+        if (setVisibility('versionContainer', exampleData.version)) {
+            setText('version', exampleData.version);
+            setLink('versionLink', `https://github.com/${exampleData.organisation}/${exampleData.repository}/releases/tag/v${exampleData.version}`, `v${exampleData.version}`); // Example GitHub Release link
+        }
+        const date = new Date(exampleData.timestamp);
+        setText('timestamp', date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'long' }));
+        setText('maturity', exampleData.maturity);
+        setText('type', exampleData.type);
+
+
+        // --- Populate Source & Workflow ---
+        setText('repository', exampleData.repository);
+        setLink('repositoryLink', `https://github.com/${exampleData.organisation}/${exampleData.repository}`, exampleData.repository);
+        setText('branch', exampleData.branch);
+        const protectedBranchEl = document.getElementById('protectedBranch');
+        if (protectedBranchEl) {
+            protectedBranchEl.textContent = exampleData.protectedBranch === "Yes" ? "Protected" : "Not Protected";
+            protectedBranchEl.className = exampleData.protectedBranch === "Yes" ? 'status-protected' : 'status-unprotected';
+        }
+        setText('revision', exampleData.revision.substring(0, 12) + '...'); // Shorten for display
+        setLink('revisionLink', `https://github.com/${exampleData.organisation}/${exampleData.repository}/commit/${exampleData.revision}`, exampleData.revision.substring(0,12)+'...');
+        setText('workflow', exampleData.workflow);
+        setLink('workflowLink', `https://github.com/${exampleData.organisation}/${exampleData.repository}/blob/${exampleData.branch}/.github/workflows/${exampleData.workflow}`, exampleData.workflow); // Assuming standard workflow path
+        setText('actor', exampleData.actor);
+        setText('runner', exampleData.runner);
+
+
+        // --- Populate Project Details ---
+        setText('projectId', exampleData.projectId);
+        if(setVisibility('projectCodeContainer', exampleData.projectCode)){
+            setText('projectCode', exampleData.projectCode);
+        }
+        setText('applicationId', exampleData.applicationId);
+        setVisibility('applicationIDIPContainer', exampleData.applicationIDIP) && setText('applicationIDIP', exampleData.applicationIDIP);
+        setVisibility('platformContainer', exampleData.platform) && setText('platform', exampleData.platform);
+        setVisibility('languagesContainer', exampleData.languages) && setText('languages', exampleData.languages);
+        setVisibility('buildSystemContainer', exampleData.buildSystem) && setText('buildSystem', exampleData.buildSystem);
+        setVisibility('deliveryContainer', exampleData.delivery) && setText('delivery', exampleData.delivery);
+
+
+        // --- Populate Team & Organisation ---
+        setText('organisation', exampleData.organisation);
+        setLink('organisationLink', `https://github.com/${exampleData.organisation}`, exampleData.organisation);
+        setText('teamCode', exampleData.teamCode);
+        setLink('teamLink', `https://github.com/orgs/${exampleData.organisation}/teams/${exampleData.teamSlug}`, exampleData.teamCode);
+        setText('teamSlug', exampleData.teamSlug);
+        setText('collaborators', exampleData.collaborators);
+
+
+        // --- Populate Integrations (and show section if any are present) ---
+        let integrationsVisible = false;
+        if (setVisibility('issueTrackingContainer', exampleData.issueTracking)) {
+            setText('issueTracking', exampleData.issueTracking);
+            setLink('issueTrackingLink', `https://jira.example.com/browse/${exampleData.issueTracking}`, exampleData.issueTracking); // Replace jira.example.com
+            integrationsVisible = true;
+        }
+        if (setVisibility('changeManagementContainer', exampleData.changeManagement)) {
+            setText('changeManagement', exampleData.changeManagement);
+            setLink('changeManagementLink', `https://servicenow.example.com/nav_to.do?uri=task.do?sysparm_query=number=${exampleData.changeManagement}`, exampleData.changeManagement); // Replace servicenow.example.com
+            integrationsVisible = true;
+        }
+         if (setVisibility('teamCityContainer', exampleData.teamCity)) {
+            setText('teamCity', exampleData.teamCity);
+            // You'll need to construct the TeamCity URL based on your instance
+            setLink('teamCityLink', `https://teamcity.example.com/viewType.html?buildTypeId=${exampleData.teamCity}`, exampleData.teamCity); // Replace teamcity.example.com
+            integrationsVisible = true;
+        }
+
+        const integrationsSection = document.getElementById('integrationsSection');
+        if (integrationsSection && integrationsVisible) {
+            integrationsSection.style.display = '';
+        }
+
+
+        // --- Populate Artefacts ---
+        const artefactsList = document.getElementById('artefactsList');
+        if (artefactsList && exampleData.artefacts) {
+            artefactsList.innerHTML = ''; // Clear static examples
+            exampleData.artefacts.forEach(artefact => {
+                const li = document.createElement('li');
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'artefact-name';
+                nameSpan.textContent = artefact.name;
+                li.appendChild(nameSpan);
+
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'artefact-type';
+                typeSpan.textContent = `(${artefact.type})`;
+                li.appendChild(typeSpan);
+
+                const link = document.createElement('a');
+                link.href = artefact.link;
+                link.textContent = 'Download/View';
+                link.target = '_blank'; // Open in new tab
+                li.appendChild(link);
+                artefactsList.appendChild(li);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
