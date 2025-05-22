@@ -596,7 +596,12 @@
                 }
             }
             if (data.runner) document.getElementById('runner').textContent = data.runner;
-            if (data.timestamp) document.getElementById('timestamp').textContent = data.timestamp;
+
+            if (data.timestamp) {
+                const date = new Date(data.timestamp);
+                document.getElementById('timestamp').textContent = date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'long' });
+            }
+
             if (data.maturity) document.getElementById('project-maturity').textContent = data.maturity;
 
             // Update technology information
