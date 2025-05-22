@@ -276,10 +276,6 @@
                 <span class="label">Project ID:</span>
                 <span id="project-id"></span>
             </div>
-            <div class="property-item optional-item" id="projectCodeContainer" style="display: none;">
-                <span class="label">Project Code:</span>
-                <span id="project-code"></span>
-            </div>
             <div class="property-item">
                 <span class="label">Application ID:</span>
                 <span id="application-id"></span>
@@ -422,9 +418,6 @@
 
             // --- Populate Project Details ---
             setText('project-id', data.project.id);
-            if(setVisibility('projectCodeContainer', data.project.code)){
-                setText('project-code', data.project.code);
-            }
             setText('application-id', data.application.id);
             setVisibility('applicationIDIPContainer', data.application.idip) && setText('application-idip', data.application.idip);
             setVisibility('platformContainer', data.platform) && setText('platform', data.platform);

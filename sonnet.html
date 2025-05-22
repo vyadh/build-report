@@ -353,7 +353,6 @@
             </div>
             <div class="report-subtitle">
                 <span id="application-name"></span>
-                <span id="repository"><a href="#" target="_blank"></a></span>
             </div>
         </div>
         <div class="header-right">
@@ -386,57 +385,20 @@
             </div>
         </div>
 
-        <!-- Project Information -->
+        <!-- Build Information -->
         <div class="info-section">
-            <h3 class="section-title">Project Information</h3>
+            <h3 class="section-title">Build Information</h3>
             <div class="info-list">
-                <div class="info-item">
-                    <div class="item-label">Project ID</div>
-                    <div class="item-value" id="project-id"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Project Code</div>
-                    <div class="item-value" id="project-code"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Application ID</div>
-                    <div class="item-value" id="application-id"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Application IDIP</div>
-                    <div class="item-value" id="application-idip"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Team Information -->
-        <div class="info-section">
-            <h3 class="section-title">Team & Organization</h3>
-            <div class="info-list">
-                <div class="info-item">
-                    <div class="item-label">Team</div>
-                    <div class="item-value"><a href="#" target="_blank" id="team-code"></a> (<span id="team-slug"></span>)</div>
-                </div>
-
                 <div class="info-item">
                     <div class="item-label">Organisation</div>
                     <div class="item-value"><a href="#" target="_blank" id="organisation"></a></div>
                 </div>
 
                 <div class="info-item">
-                    <div class="item-label">Collaborators</div>
-                    <div class="item-value" id="collaborators"></div>
+                    <div class="item-label">Repository</div>
+                    <div class="item-value"><a href="#" target="_blank" id="repository"></a></div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Build & Platform Information -->
-        <div class="info-section">
-            <h3 class="section-title">Build Information</h3>
-            <div class="info-list">
                 <div class="info-item">
                     <div class="item-label">Revision</div>
                     <div class="item-value"><a href="#" target="_blank" id="revision"></a></div>
@@ -460,6 +422,43 @@
                 <div class="info-item">
                     <div class="item-label">Timestamp</div>
                     <div class="item-value" id="timestamp"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Information -->
+        <div class="info-section">
+            <h3 class="section-title">Project Information</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="item-label">Project ID</div>
+                    <div class="item-value" id="project-id"></div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Application ID</div>
+                    <div class="item-value" id="application-id"></div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Application IDIP</div>
+                    <div class="item-value" id="application-idip"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Information -->
+        <div class="info-section">
+            <h3 class="section-title">Team</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="item-label">Team</div>
+                    <div class="item-value"><a href="#" target="_blank" id="team-code"></a> (<span id="team-slug"></span>)</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="item-label">Collaborators</div>
+                    <div class="item-value" id="collaborators"></div>
                 </div>
             </div>
         </div>
@@ -498,17 +497,17 @@
             <h3 class="section-title">Integration & Management</h3>
             <div class="info-list">
                 <div class="info-item">
-                    <div class="item-label">Issue Tracking</div>
+                    <div class="item-label">Issue Tracking (Jira)</div>
                     <div class="item-value"><a href="#" target="_blank" id="issue-tracking"></a></div>
                 </div>
 
                 <div class="info-item">
-                    <div class="item-label">Change Management</div>
+                    <div class="item-label">Change Management (ServiceNow)</div>
                     <div class="item-value"><a href="#" target="_blank" id="change-management"></a></div>
                 </div>
 
                 <div class="info-item">
-                    <div class="item-label">TeamCity</div>
+                    <div class="item-label">Deployments (TeamCity)</div>
                     <div class="item-value"><a href="#" target="_blank" id="team-city"></a></div>
                 </div>
             </div>
@@ -536,7 +535,6 @@
             if (data.project && data.project.id) document.getElementById('project-id').textContent = data.project.id;
             if (data.project && data.project.name) document.getElementById('project-name').textContent = data.project.name;
             if (data.project && data.project.description) document.getElementById('project-description').textContent = data.project.description;
-            if (data.project && data.project.code) document.getElementById('project-code').textContent = data.project.code;
             if (data.project && data.project.type) document.getElementById('project-type').textContent = data.project.type;
 
             // Update application information
@@ -692,4 +690,3 @@
 
 </body>
 </html>
-
