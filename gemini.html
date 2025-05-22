@@ -91,11 +91,12 @@
             word-break: break-word; /* Prevents long strings from breaking layout */
         }
 
-        .property-item strong {
+        .property-item .label {
             display: block;
             color: var(--primary-text-color);
             margin-bottom: 5px;
             font-size: 0.95em;
+            font-weight: bold;
         }
 
         .property-item span, .property-item a {
@@ -215,23 +216,23 @@
         <h2>Build & Version</h2>
         <div class="grid-container">
             <div class="property-item" id="versionContainer" style="display: none;">
-                <strong>Version:</strong>
+                <span class="label">Version:</span>
                 <a href="#" id="versionLink" target="_blank" class="prominent"><span id="version"></span></a>
             </div>
             <div class="property-item">
-                <strong>Build Reference:</strong>
+                <span class="label">Build Reference:</span>
                 <a href="#" id="buildReferenceLink" target="_blank" class="prominent"><span id="buildReference"></span></a>
             </div>
             <div class="property-item">
-                <strong>Timestamp:</strong>
+                <span class="label">Timestamp:</span>
                 <span id="timestamp"></span>
             </div>
             <div class="property-item">
-                <strong>Maturity:</strong>
+                <span class="label">Maturity:</span>
                 <span id="maturity"></span>
             </div>
             <div class="property-item">
-                <strong>Type:</strong>
+                <span class="label">Type:</span>
                 <span id="type" class="prominent"></span>
             </div>
         </div>
@@ -241,29 +242,29 @@
         <h2>Source & Workflow</h2>
         <div class="grid-container">
             <div class="property-item">
-                <strong>Repository:</strong>
+                <span class="label">Repository:</span>
                 <a href="#" id="repositoryLink" target="_blank" class="prominent"><span
                         id="repository"></span></a>
             </div>
             <div class="property-item">
-                <strong>Branch:</strong>
+                <span class="label">Branch:</span>
                 <span id="branch"></span>
                 (<span id="protectedBranch" class="status-protected"></span>)
             </div>
             <div class="property-item">
-                <strong>Revision:</strong>
+                <span class="label">Revision:</span>
                 <a href="#" id="revisionLink" target="_blank"><span id="revision"></span></a>
             </div>
             <div class="property-item">
-                <strong>Workflow:</strong>
+                <span class="label">Workflow:</span>
                 <a href="#" id="workflowLink" target="_blank"><span id="workflow"></span></a>
             </div>
             <div class="property-item">
-                <strong>Actor:</strong>
+                <span class="label">Actor:</span>
                 <span id="actor"></span>
             </div>
             <div class="property-item">
-                <strong>Runner:</strong>
+                <span class="label">Runner:</span>
                 <span id="runner"></span>
             </div>
         </div>
@@ -273,35 +274,35 @@
         <h2>Project Details</h2>
         <div class="grid-container">
             <div class="property-item">
-                <strong>Project ID:</strong>
+                <span class="label">Project ID:</span>
                 <span id="projectId"></span>
             </div>
             <div class="property-item optional-item" id="projectCodeContainer" style="display: none;">
-                <strong>Project Code:</strong>
+                <span class="label">Project Code:</span>
                 <span id="projectCode"></span>
             </div>
             <div class="property-item">
-                <strong>Application ID:</strong>
+                <span class="label">Application ID:</span>
                 <span id="applicationId"></span>
             </div>
-            <div class="property-item optional-item" id="applicationIDIPContainer" style="display: none;"><strong>Application
-                IDIP:</strong>
+            <div class="property-item optional-item" id="applicationIDIPContainer" style="display: none;"><span class="label">Application
+                IDIP:</span>
                 <span id="applicationIDIP"></span>
             </div>
             <div class="property-item optional-item" id="platformContainer" style="display: none;">
-                <strong>Platform:</strong>
+                <span class="label">Platform:</span>
                 <span id="platform"></span>
             </div>
             <div class="property-item optional-item" id="languagesContainer" style="display: none;">
-                <strong>Languages:</strong>
+                <span class="label">Languages:</span>
                 <span id="languages"></span>
             </div>
-            <div class="property-item optional-item" id="buildSystemContainer" style="display: none;"><strong>Build
-                System:</strong>
+            <div class="property-item optional-item" id="buildSystemContainer" style="display: none;"><span class="label">Build
+                System:</span>
                 <span id="buildSystem"></span>
             </div>
             <div class="property-item optional-item" id="deliveryContainer" style="display: none;">
-                <strong>Delivery:</strong>
+                <span class="label">Delivery:</span>
                 <span id="delivery"></span>
             </div>
         </div>
@@ -311,15 +312,15 @@
         <h2>Team & Organisation</h2>
         <div class="grid-container">
             <div class="property-item">
-                <strong>Organisation:</strong>
+                <span class="label">Organisation:</span>
                 <a href="#" id="organisationLink" target="_blank"><span id="organisation"></span></a>
             </div>
             <div class="property-item">
-                <strong>Team:</strong>
+                <span class="label">Team:</span>
                 <a href="#" id="teamLink" target="_blank"><span id="teamCode"></span></a> (<span id="teamSlug"></span>)
             </div>
             <div class="property-item">
-                <strong>Collaborators:</strong>
+                <span class="label">Collaborators:</span>
                 <span id="collaborators"></span>
             </div>
         </div>
@@ -328,16 +329,16 @@
     <section class="report-section" id="integrationsSection" style="display: none;">
         <h2>Integrations</h2>
         <div class="grid-container">
-            <div class="property-item optional-item" id="issueTrackingContainer" style="display: none;"><strong>Issue
-                Tracking (Jira):</strong>
+            <div class="property-item optional-item" id="issueTrackingContainer" style="display: none;"><span class="label">Issue
+                Tracking (Jira):</span>
                 <a href="#" id="issueTrackingLink" target="_blank"><span id="issueTracking"></span></a>
             </div>
-            <div class="property-item optional-item" id="changeManagementContainer" style="display: none;"><strong>Change
-                Management (ServiceNow):</strong>
+            <div class="property-item optional-item" id="changeManagementContainer" style="display: none;"><span class="label">Change
+                Management (ServiceNow):</span>
                 <a href="#" id="changeManagementLink" target="_blank"><span id="changeManagement"></span></a>
             </div>
             <div class="property-item optional-item" id="teamCityContainer" style="display: none;">
-                <strong>TeamCity Project:</strong>
+                <span class="label">TeamCity Project:</span>
                 <a href="#" id="teamCityLink" target="_blank"><span id="teamCity"></span></a>
             </div>
         </div>
