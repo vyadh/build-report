@@ -567,24 +567,24 @@
         // Function to update the report with data
         function updateReportData(data) {
             // Update project information
-            if (data.project_id) document.getElementById('project-id').textContent = data.project_id;
-            if (data.project_name) document.getElementById('project-name').textContent = data.project_name;
-            if (data.project_description) document.getElementById('project-description').textContent = data.project_description;
-            if (data.project_code) document.getElementById('project-code').textContent = data.project_code;
-            if (data.project_type) document.getElementById('project-type').textContent = data.project_type;
+            if (data.project && data.project.id) document.getElementById('project-id').textContent = data.project.id;
+            if (data.project && data.project.name) document.getElementById('project-name').textContent = data.project.name;
+            if (data.project && data.project.description) document.getElementById('project-description').textContent = data.project.description;
+            if (data.project && data.project.code) document.getElementById('project-code').textContent = data.project.code;
+            if (data.project && data.project.type) document.getElementById('project-type').textContent = data.project.type;
 
             // Update application information
-            if (data.application_id) document.getElementById('application-id').textContent = data.application_id;
-            if (data.application_name) document.getElementById('application-name').textContent = data.application_name;
-            if (data.application_idip) document.getElementById('application-idip').textContent = data.application_idip;
+            if (data.application && data.application.id) document.getElementById('application-id').textContent = data.application.id;
+            if (data.application && data.application.name) document.getElementById('application-name').textContent = data.application.name;
+            if (data.application && data.application.idip) document.getElementById('application-idip').textContent = data.application.idip;
 
             // Update team and organization information
-            if (data.team_code) {
+            if (data.team && data.team.code) {
                 const teamCodeEl = document.getElementById('team-code');
-                teamCodeEl.textContent = data.team_code;
-                teamCodeEl.href = `https://github.com/orgs/${data.organisation}/teams/${data.team_slug}`;
+                teamCodeEl.textContent = data.team.code;
+                teamCodeEl.href = `https://github.com/orgs/${data.organisation}/teams/${data.team.slug}`;
             }
-            if (data.team_slug) document.getElementById('team-slug').textContent = data.team_slug;
+            if (data.team && data.team.slug) document.getElementById('team-slug').textContent = data.team.slug;
             if (data.organisation) {
                 const orgEl = document.getElementById('organisation');
                 orgEl.textContent = data.organisation;
@@ -601,7 +601,9 @@
             if (data.version) {
                 const versionEl = document.getElementById('version');
                 versionEl.textContent = data.version;
-                versionEl.href = `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}`;
+                if (data.organisation && data.repository) {
+                    versionEl.href = `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}`;
+                }
                 if (!data.version) {
                     versionEl.parentElement.style.display = 'none';
                 }
@@ -609,19 +611,25 @@
             if (data.build_reference) {
                 const buildRefEl = document.getElementById('build-reference');
                 buildRefEl.textContent = data.build_reference;
-                buildRefEl.href = `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.build_reference.split('.')[0]}`;
+                if (data.organisation && data.repository) {
+                    buildRefEl.href = `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.build_reference.split('.')[0]}`;
+                }
             }
             if (data.branch) document.getElementById('branch').textContent = data.branch;
             if (data.revision) {
                 const revisionEl = document.getElementById('revision');
                 revisionEl.textContent = data.revision.substring(0, 7);
-                revisionEl.href = `https://github.com/${data.organisation}/${data.repository}/commit/${data.revision}`;
+                if (data.organisation && data.repository) {
+                    revisionEl.href = `https://github.com/${data.organisation}/${data.repository}/commit/${data.revision}`;
+                }
             }
             if (data.actor) document.getElementById('actor').textContent = data.actor;
             if (data.workflow) {
                 const workflowEl = document.getElementById('workflow');
                 workflowEl.textContent = data.workflow;
-                workflowEl.href = `https://github.com/${data.organisation}/${data.repository}/blob/main/.github/workflows/${data.workflow}`;
+                if (data.organisation && data.repository) {
+                    workflowEl.href = `https://github.com/${data.organisation}/${data.repository}/blob/main/.github/workflows/${data.workflow}`;
+                }
             }
             if (data.runner) document.getElementById('runner').textContent = data.runner;
             if (data.timestamp) document.getElementById('timestamp').textContent = data.timestamp;
@@ -718,3 +726,4 @@
 
 </body>
 </html>
+

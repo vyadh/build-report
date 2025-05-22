@@ -390,10 +390,10 @@
 
         function updateReportWithData(data) {
             // --- Populate Header ---
-            setText('projectName', data.project_name);
-            setText('applicationName', data.application_name);
-            if (setVisibility('projectDescriptionContainer', data.project_description)) {
-                setText('projectDescription', data.project_description);
+            setText('projectName', data.project.name);
+            setText('applicationName', data.application.name);
+            if (setVisibility('projectDescriptionContainer', data.project.description)) {
+                setText('projectDescription', data.project.description);
             }
 
             // --- Populate Build & Version ---
@@ -408,7 +408,7 @@
             const date = new Date(data.timestamp);
             setText('timestamp', date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'long' }));
             setText('maturity', data.maturity);
-            setText('type', data.project_type);
+            setText('type', data.project.type);
 
             // --- Populate Source & Workflow ---
             setText('repository', data.repository);
@@ -427,12 +427,12 @@
             setText('runner', data.runner);
 
             // --- Populate Project Details ---
-            setText('projectId', data.project_id);
-            if(setVisibility('projectCodeContainer', data.project_code)){
-                setText('projectCode', data.project_code);
+            setText('projectId', data.project.id);
+            if(setVisibility('projectCodeContainer', data.project.code)){
+                setText('projectCode', data.project.code);
             }
-            setText('applicationId', data.application_id);
-            setVisibility('applicationIDIPContainer', data.application_idip) && setText('applicationIDIP', data.application_idip);
+            setText('applicationId', data.application.id);
+            setVisibility('applicationIDIPContainer', data.application.idip) && setText('applicationIDIP', data.application.idip);
             setVisibility('platformContainer', data.platform) && setText('platform', data.platform);
             setVisibility('languagesContainer', data.languages) && setText('languages', data.languages);
             setVisibility('buildSystemContainer', data.build_system) && setText('buildSystem', data.build_system);
@@ -441,9 +441,9 @@
             // --- Populate Team & Organisation ---
             setText('organisation', data.organisation);
             setLink('organisationLink', `https://github.com/${data.organisation}`, data.organisation);
-            setText('teamCode', data.team_code);
-            setLink('teamLink', `https://github.com/orgs/${data.organisation}/teams/${data.team_slug}`, data.team_code);
-            setText('teamSlug', data.team_slug);
+            setText('teamCode', data.team.code);
+            setLink('teamLink', `https://github.com/orgs/${data.organisation}/teams/${data.team.slug}`, data.team.code);
+            setText('teamSlug', data.team.slug);
             setText('collaborators', data.collaborators);
 
             // --- Populate Integrations (and show section if any are present) ---

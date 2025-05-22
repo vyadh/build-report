@@ -1,20 +1,23 @@
 {
-  "project_id": "hello-world",
-  "project_name": "Hello World",
-  "project_description": "The hello world service",
-  "project_code": "hello",
-  "project_type": "API",
-
-  "application_id": "samples",
-  "application_name": "Samples",
-  "application_idip": "SAMPLES",
-
-  "team_code": "DPE",
-  "team_slug": "development-platform-engineering",
+  "project": {
+    "id": "hello-world",
+    "name": "Hello World",
+    "description": "The hello world service",
+    "code": "hello",
+    "type": "API"
+  },
+  "application": {
+    "id": "samples",
+    "name": "Samples",
+    "idip": "SAMPLES"
+  },
+  "team": {
+    "code": "DPE",
+    "slug": "development-platform-engineering"
+  },
   "organisation": "insightinvestment",
   "repository": "dpe-hello-world",
   "collaborators": "development-platform-engineering",
-
   "version": "1.2.3",
   "build_reference": "111122233.1.2",
   "branch": "main",
@@ -25,16 +28,13 @@
   "runner": "insight-runner-2",
   "timestamp": "2025-05-22T05:14:32Z",
   "maturity": "Snapshot",
-
   "platform": "Java",
   "languages": "Java, Dockerfile, Shell",
   "build_system": "gradle",
   "delivery": "Kubernetes (Helm) [namespace]",
-
   "issue_tracking": "HLO",
   "change_management": "HelloWorld",
   "team_city": "Apps_DPE_HelloWorld",
-
   "artifacts": [
     {
       "name": "hello-world-1.2.3.jar",
@@ -67,6 +67,5 @@
       "url": "https://charts.example.com/hello-world-1.2.3.tgz"
     }
   ],
-
   "generation_time": "2025-05-22 07:13:57"
 }
