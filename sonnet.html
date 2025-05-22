@@ -567,24 +567,24 @@
         // Function to update the report with data
         function updateReportData(data) {
             // Update project information
-            if (data.projectId) document.getElementById('project-id').textContent = data.projectId;
-            if (data.projectName) document.getElementById('project-name').textContent = data.projectName;
-            if (data.projectDescription) document.getElementById('project-description').textContent = data.projectDescription;
-            if (data.projectCode) document.getElementById('project-code').textContent = data.projectCode;
-            if (data.projectType) document.getElementById('project-type').textContent = data.projectType;
+            if (data.project_id) document.getElementById('project-id').textContent = data.project_id;
+            if (data.project_name) document.getElementById('project-name').textContent = data.project_name;
+            if (data.project_description) document.getElementById('project-description').textContent = data.project_description;
+            if (data.project_code) document.getElementById('project-code').textContent = data.project_code;
+            if (data.project_type) document.getElementById('project-type').textContent = data.project_type;
 
             // Update application information
-            if (data.applicationId) document.getElementById('application-id').textContent = data.applicationId;
-            if (data.applicationName) document.getElementById('application-name').textContent = data.applicationName;
-            if (data.applicationIdip) document.getElementById('application-idip').textContent = data.applicationIdip;
+            if (data.application_id) document.getElementById('application-id').textContent = data.application_id;
+            if (data.application_name) document.getElementById('application-name').textContent = data.application_name;
+            if (data.application_idip) document.getElementById('application-idip').textContent = data.application_idip;
 
             // Update team and organization information
-            if (data.teamCode) {
+            if (data.team_code) {
                 const teamCodeEl = document.getElementById('team-code');
-                teamCodeEl.textContent = data.teamCode;
-                teamCodeEl.href = `https://github.com/orgs/${data.organisation}/teams/${data.teamSlug}`;
+                teamCodeEl.textContent = data.team_code;
+                teamCodeEl.href = `https://github.com/orgs/${data.organisation}/teams/${data.team_slug}`;
             }
-            if (data.teamSlug) document.getElementById('team-slug').textContent = data.teamSlug;
+            if (data.team_slug) document.getElementById('team-slug').textContent = data.team_slug;
             if (data.organisation) {
                 const orgEl = document.getElementById('organisation');
                 orgEl.textContent = data.organisation;
@@ -602,15 +602,14 @@
                 const versionEl = document.getElementById('version');
                 versionEl.textContent = data.version;
                 versionEl.href = `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}`;
-                // Hide if not a release build
                 if (!data.version) {
-                    versionEl.parentElement.parentElement.style.display = 'none';
+                    versionEl.parentElement.style.display = 'none';
                 }
             }
-            if (data.buildReference) {
+            if (data.build_reference) {
                 const buildRefEl = document.getElementById('build-reference');
-                buildRefEl.textContent = data.buildReference;
-                buildRefEl.href = `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.buildReference.split('.')[0]}`;
+                buildRefEl.textContent = data.build_reference;
+                buildRefEl.href = `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.build_reference.split('.')[0]}`;
             }
             if (data.branch) document.getElementById('branch').textContent = data.branch;
             if (data.revision) {
@@ -640,28 +639,28 @@
                     langContainer.appendChild(tagSpan);
                 });
             }
-            if (data.buildSystem) document.getElementById('build-system').textContent = data.buildSystem;
+            if (data.build_system) document.getElementById('build-system').textContent = data.build_system;
             if (data.delivery) document.getElementById('delivery').textContent = data.delivery;
 
             // Update integration information
-            if (data.issueTracking) {
+            if (data.issue_tracking) {
                 const issueTrackingEl = document.getElementById('issue-tracking');
-                issueTrackingEl.textContent = data.issueTracking;
-                issueTrackingEl.href = `https://jira.example.com/projects/${data.issueTracking}`;
+                issueTrackingEl.textContent = data.issue_tracking;
+                issueTrackingEl.href = `https://jira.example.com/projects/${data.issue_tracking}`;
             }
-            if (data.changeManagement) {
+            if (data.change_management) {
                 const changeManagementEl = document.getElementById('change-management');
-                changeManagementEl.textContent = data.changeManagement;
-                changeManagementEl.href = `https://servicenow.example.com/item/${data.changeManagement}`;
+                changeManagementEl.textContent = data.change_management;
+                changeManagementEl.href = `https://servicenow.example.com/item/${data.change_management}`;
             }
-            if (data.teamCity) {
+            if (data.team_city) {
                 const teamCityEl = document.getElementById('team-city');
-                teamCityEl.textContent = data.teamCity;
-                teamCityEl.href = `https://teamcity.example.com/project/${data.teamCity}`;
+                teamCityEl.textContent = data.team_city;
+                teamCityEl.href = `https://teamcity.example.com/project/${data.team_city}`;
             }
 
             // Update generation date
-            document.getElementById('generation-date').textContent = data.generationTime || new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            document.getElementById('generation-date').textContent = data.generation_time || new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
 
             // Update artifacts
             if (data.artifacts && data.artifacts.length > 0) {

@@ -1,24 +1,24 @@
 {
-  "projectId": "hello-world",
-  "projectName": "Hello World",
-  "projectDescription": "The hello world service",
-  "projectCode": "hello",
-  "projectType": "API",
+  "project_id": "hello-world",
+  "project_name": "Hello World",
+  "project_description": "The hello world service",
+  "project_code": "hello",
+  "project_type": "API",
 
-  "applicationId": "samples",
-  "applicationName": "Samples",
-  "applicationIdip": "SAMPLES",
+  "application_id": "samples",
+  "application_name": "Samples",
+  "application_idip": "SAMPLES",
 
-  "teamCode": "DPE",
-  "teamSlug": "development-platform-engineering",
+  "team_code": "DPE",
+  "team_slug": "development-platform-engineering",
   "organisation": "insightinvestment",
   "repository": "dpe-hello-world",
   "collaborators": "development-platform-engineering",
 
   "version": "1.2.3",
-  "buildReference": "111122233.1.2",
+  "build_reference": "111122233.1.2",
   "branch": "main",
-  "protectedBranch": "Yes",
+  "protected_branch": "Yes",
   "revision": "84a3df9c2e1a9b4e5f8c7d6b3a2e1f0",
   "actor": "vyadh",
   "workflow": "build.yml",
@@ -28,12 +28,12 @@
 
   "platform": "Java",
   "languages": "Java, Dockerfile, Shell",
-  "buildSystem": "gradle",
+  "build_system": "gradle",
   "delivery": "Kubernetes (Helm) [namespace]",
 
-  "issueTracking": "HLO",
-  "changeManagement": "HelloWorld",
-  "teamCity": "Apps_DPE_HelloWorld",
+  "issue_tracking": "HLO",
+  "change_management": "HelloWorld",
+  "team_city": "Apps_DPE_HelloWorld",
 
   "artifacts": [
     {
@@ -68,5 +68,5 @@
     }
   ],
 
-  "generationTime": "2025-05-22 07:13:57"
+  "generation_time": "2025-05-22 07:13:57"
 }

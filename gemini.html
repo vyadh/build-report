@@ -390,26 +390,25 @@
 
         function updateReportWithData(data) {
             // --- Populate Header ---
-            setText('projectName', data.projectName);
-            setText('applicationName', data.applicationName);
-            if (setVisibility('projectDescriptionContainer', data.projectDescription)) {
-                setText('projectDescription', data.projectDescription);
+            setText('projectName', data.project_name);
+            setText('applicationName', data.application_name);
+            if (setVisibility('projectDescriptionContainer', data.project_description)) {
+                setText('projectDescription', data.project_description);
             }
 
             // --- Populate Build & Version ---
-            setText('buildReference', data.buildReference);
-            setLink('buildReferenceLink', `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.buildReference.split('/').pop()}`, data.buildReference); // Example GitHub Actions link
+            setText('buildReference', data.build_reference);
+            setLink('buildReferenceLink', `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.build_reference.split('/').pop()}`, data.build_reference);
 
             if (setVisibility('versionContainer', data.version)) {
                 setText('version', data.version);
-                setLink('versionLink', `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}`, `v${data.version}`); // Example GitHub Release link
+                setLink('versionLink', `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}`, `v${data.version}`);
             }
 
             const date = new Date(data.timestamp);
             setText('timestamp', date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'long' }));
             setText('maturity', data.maturity);
-            setText('type', data.projectType);
-
+            setText('type', data.project_type);
 
             // --- Populate Source & Workflow ---
             setText('repository', data.repository);
@@ -417,55 +416,51 @@
             setText('branch', data.branch);
             const protectedBranchEl = document.getElementById('protectedBranch');
             if (protectedBranchEl) {
-                protectedBranchEl.textContent = data.protectedBranch === "Yes" ? "Protected" : "Not Protected";
-                protectedBranchEl.className = data.protectedBranch === "Yes" ? 'status-protected' : 'status-unprotected';
+                protectedBranchEl.textContent = data.protected_branch === "Yes" ? "Protected" : "Not Protected";
+                protectedBranchEl.className = data.protected_branch === "Yes" ? 'status-protected' : 'status-unprotected';
             }
-            setText('revision', data.revision.substring(0, 12) + '...'); // Shorten for display
+            setText('revision', data.revision.substring(0, 12) + '...');
             setLink('revisionLink', `https://github.com/${data.organisation}/${data.repository}/commit/${data.revision}`, data.revision.substring(0,12)+'...');
             setText('workflow', data.workflow);
-            setLink('workflowLink', `https://github.com/${data.organisation}/${data.repository}/blob/${data.branch}/.github/workflows/${data.workflow}`, data.workflow); // Assuming standard workflow path
+            setLink('workflowLink', `https://github.com/${data.organisation}/${data.repository}/blob/${data.branch}/.github/workflows/${data.workflow}`, data.workflow);
             setText('actor', data.actor);
             setText('runner', data.runner);
 
-
             // --- Populate Project Details ---
-            setText('projectId', data.projectId);
-            if(setVisibility('projectCodeContainer', data.projectCode)){
-                setText('projectCode', data.projectCode);
+            setText('projectId', data.project_id);
+            if(setVisibility('projectCodeContainer', data.project_code)){
+                setText('projectCode', data.project_code);
             }
-            setText('applicationId', data.applicationId);
-            setVisibility('applicationIDIPContainer', data.applicationIdip) && setText('applicationIDIP', data.applicationIdip);
+            setText('applicationId', data.application_id);
+            setVisibility('applicationIDIPContainer', data.application_idip) && setText('applicationIDIP', data.application_idip);
             setVisibility('platformContainer', data.platform) && setText('platform', data.platform);
             setVisibility('languagesContainer', data.languages) && setText('languages', data.languages);
-            setVisibility('buildSystemContainer', data.buildSystem) && setText('buildSystem', data.buildSystem);
+            setVisibility('buildSystemContainer', data.build_system) && setText('buildSystem', data.build_system);
             setVisibility('deliveryContainer', data.delivery) && setText('delivery', data.delivery);
-
 
             // --- Populate Team & Organisation ---
             setText('organisation', data.organisation);
             setLink('organisationLink', `https://github.com/${data.organisation}`, data.organisation);
-            setText('teamCode', data.teamCode);
-            setLink('teamLink', `https://github.com/orgs/${data.organisation}/teams/${data.teamSlug}`, data.teamCode);
-            setText('teamSlug', data.teamSlug);
+            setText('teamCode', data.team_code);
+            setLink('teamLink', `https://github.com/orgs/${data.organisation}/teams/${data.team_slug}`, data.team_code);
+            setText('teamSlug', data.team_slug);
             setText('collaborators', data.collaborators);
-
 
             // --- Populate Integrations (and show section if any are present) ---
             let integrationsVisible = false;
-            if (setVisibility('issueTrackingContainer', data.issueTracking)) {
-                setText('issueTracking', data.issueTracking);
-                setLink('issueTrackingLink', `https://jira.example.com/browse/${data.issueTracking}`, data.issueTracking); // Replace jira.example.com
+            if (setVisibility('issueTrackingContainer', data.issue_tracking)) {
+                setText('issueTracking', data.issue_tracking);
+                setLink('issueTrackingLink', `https://jira.example.com/browse/${data.issue_tracking}`, data.issue_tracking);
                 integrationsVisible = true;
             }
-            if (setVisibility('changeManagementContainer', data.changeManagement)) {
-                setText('changeManagement', data.changeManagement);
-                setLink('changeManagementLink', `https://servicenow.example.com/nav_to.do?uri=task.do?sysparm_query=number=${data.changeManagement}`, data.changeManagement); // Replace servicenow.example.com
+            if (setVisibility('changeManagementContainer', data.change_management)) {
+                setText('changeManagement', data.change_management);
+                setLink('changeManagementLink', `https://servicenow.example.com/nav_to.do?uri=task.do?sysparm_query=number=${data.change_management}`, data.change_management);
                 integrationsVisible = true;
             }
-             if (setVisibility('teamCityContainer', data.teamCity)) {
-                setText('teamCity', data.teamCity);
-                // You'll need to construct the TeamCity URL based on your instance
-                setLink('teamCityLink', `https://teamcity.example.com/viewType.html?buildTypeId=${data.teamCity}`, data.teamCity); // Replace teamcity.example.com
+             if (setVisibility('teamCityContainer', data.team_city)) {
+                setText('teamCity', data.team_city);
+                setLink('teamCityLink', `https://teamcity.example.com/viewType.html?buildTypeId=${data.team_city}`, data.team_city);
                 integrationsVisible = true;
             }
 
@@ -473,7 +468,6 @@
             if (integrationsSection && integrationsVisible) {
                 integrationsSection.style.display = '';
             }
-
 
             // --- Populate Artefacts ---
             const artefactsList = document.getElementById('artefactsList');
