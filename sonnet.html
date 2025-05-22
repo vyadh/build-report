@@ -58,12 +58,30 @@
             position: relative;
         }
 
-        /* Header with gradient */
+        /* Report header */
         .report-header {
             background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
             color: var(--text-primary);
             padding: var(--spacing-lg);
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header-right {
+            text-align: right;
+            max-width: 40%;
+        }
+
+        .project-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
         }
 
         .report-title {
@@ -327,14 +345,19 @@
 <div class="build-report">
     <!-- Header Section -->
     <div class="report-header">
-        <div class="report-title">
-            <span id="project-name"></span>
-            <span class="badge badge-primary" id="project-type"></span>
-            <span class="badge badge-secondary" id="project-maturity"></span>
+        <div class="header-left">
+            <div class="report-title">
+                <span id="project-name"></span>
+                <span class="badge badge-primary" id="project-type"></span>
+                <span class="badge badge-secondary" id="project-maturity"></span>
+            </div>
+            <div class="report-subtitle">
+                <span id="application-name"></span>
+                <span id="repository"><a href="#" target="_blank"></a></span>
+            </div>
         </div>
-        <div class="report-subtitle">
-            <span id="application-name"></span>
-            <span id="repository"><a href="#" target="_blank"></a></span>
+        <div class="header-right">
+            <div class="project-description" id="project-description"></div>
         </div>
     </div>
 
@@ -375,11 +398,6 @@
                 <div class="info-item">
                     <div class="item-label">Project Code</div>
                     <div class="item-value" id="project-code"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Project Description</div>
-                    <div class="item-value" id="project-description"></div>
                 </div>
 
                 <div class="info-item">
@@ -674,3 +692,4 @@
 
 </body>
 </html>
+
