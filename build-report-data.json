@@ -16,7 +16,6 @@
   },
   "organisation": "myorg",
   "repository": "dpe-hello-world",
-  "collaborators": "development-platform-engineering",
   "version": "v1.2.3",
   "build_reference": "111122233.1.2",
   "branch": "main",

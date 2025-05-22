@@ -444,21 +444,10 @@
                     <div class="item-label">Application IDIP</div>
                     <div class="item-value" id="application-idip"></div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Team Information -->
-        <div class="info-section">
-            <h3 class="section-title">Team</h3>
-            <div class="info-list">
                 <div class="info-item">
                     <div class="item-label">Team</div>
                     <div class="item-value"><a href="#" target="_blank" id="team-code"></a> (<span id="team-slug"></span>)</div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Collaborators</div>
-                    <div class="item-value" id="collaborators"></div>
                 </div>
             </div>
         </div>
@@ -559,7 +548,6 @@
                 repoEl.textContent = data.repository;
                 repoEl.href = `https://github.com/${data.organisation}/${data.repository}`;
             }
-            if (data.collaborators) document.getElementById('collaborators').textContent = data.collaborators;
 
             // Update build information
             if (data.version) {
