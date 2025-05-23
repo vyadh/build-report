@@ -723,30 +723,36 @@
 
             updateElement('build-system', project?.build_system);
 
-            if (protected_branch !== undefined) {
-                const protectionBadge = document.getElementById('protection');
-                protectionBadge.style.display = '';
+            // Helper function to handle badge display and styling
+            const updateBadge = (id, isActive, activeText, activeClass, inactiveText, inactiveClass) => {
+                const badge = document.getElementById(id);
+                if (!badge) return;
 
-                if (protected_branch) {
-                    protectionBadge.textContent = 'Protected';
-                    protectionBadge.classList.add('badge-success');
-                } else {
-                    protectionBadge.textContent = 'Unprotected';
-                    protectionBadge.classList.add('badge-subtle');
-                }
+                badge.style.display = '';
+                badge.textContent = isActive ? activeText : inactiveText;
+                badge.classList.add(isActive ? activeClass : inactiveClass);
+            };
+
+            if (protected_branch !== undefined) {
+                updateBadge(
+                    'protection',
+                    protected_branch,
+                    'Protected',
+                    'badge-success',
+                    'Unprotected',
+                    'badge-subtle'
+                );
             }
 
             if (snapshot !== undefined) {
-                const maturityBadge = document.getElementById('project-maturity');
-                maturityBadge.style.display = '';
-
-                if (snapshot) {
-                    maturityBadge.textContent = "Snapshot";
-                    maturityBadge.classList.add('badge-secondary');
-                } else {
-                    maturityBadge.textContent = "Release";
-                    maturityBadge.classList.add('badge-success');
-                }
+                updateBadge(
+                    'project-maturity',
+                    snapshot,
+                    'Snapshot',
+                    'badge-secondary',
+                    'Release',
+                    'badge-success'
+                );
             }
 
             // Delivery information
