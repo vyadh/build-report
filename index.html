@@ -545,15 +545,18 @@
 
         // Get icon for artifact based on type
         function getArtifactIcon(type) {
-            const typeMap = {
-                'container-image': { icon: 'image', label: 'Container Image' },
-                'helm-chart': { icon: 'insert_chart', label: 'Helm Chart' },
-                'jar': { icon: 'code', label: 'JAR' },
-                'documentation': { icon: 'description', label: 'Documentation' },
-                'source': { icon: 'source', label: 'Source' }
-            };
+            if (!type) return { icon: 'file_present', label: 'Unknown' };
 
-            return typeMap[type.toLowerCase()] || { icon: 'file_present', label: type };
+            const lowerType = type.toLowerCase();
+
+            switch (lowerType) {
+                case 'container-image': return { icon: 'image', label: 'Container Image' };
+                case 'helm-chart': return { icon: 'insert_chart', label: 'Helm Chart' };
+                case 'jar': return { icon: 'code', label: 'JAR' };
+                case 'documentation': return { icon: 'description', label: 'Documentation' };
+                case 'source': return { icon: 'source', label: 'Source' };
+                default: return { icon: 'file_present', label: type };
+            }
         }
 
         // Function to update the report with merged data
@@ -719,15 +722,10 @@
                     (buildData.build.snapshot ? "Snapshot" : "Release") : null,
                 // Format artifacts from assets
                 artifacts: buildData.build?.assets?.map(asset => {
-                    const typeMap = {
-                        'container-image': { icon: 'image', label: 'Container Image' },
-                        'helm-chart': { icon: 'insert_chart', label: 'Helm Chart' },
-                        'jar': { icon: 'code', label: 'JAR' }
-                    };
-                    const { icon = 'file_present', label = asset.type } = typeMap[asset.type?.toLowerCase()] || {};
+                    const { icon, label } = getArtifactIcon(asset.type);
                     return {
                         name: asset.name,
-                        type: label,
+                        type: label || asset.type,
                         icon: icon,
                         url: asset.url || '#'
                     };
