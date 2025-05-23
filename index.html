@@ -559,24 +559,29 @@
             }
         }
 
-        function generateGitHubLink(type, data, owner, repository, project) {
+        function generateGitHubLink(type, build, project) {
+            const owner = build?.owner;
+            const repository = build?.repository;
+
             switch (type) {
                 case 'organisation':
                     return owner ? `https://github.com/${owner}` : null;
                 case 'repository':
-                    return owner && data ? `https://github.com/${owner}/${data}` : null;
+                    return owner && repository ? `https://github.com/${owner}/${repository}` : null;
                 case 'version':
-                    return owner && repository && data ?
-                        `https://github.com/${owner}/${repository}/releases/tag/v${data}` : null;
+                    return owner && repository && build?.version ?
+                        `https://github.com/${owner}/${repository}/releases/tag/v${build.version}` : null;
                 case 'build-reference':
-                    return owner && repository && data ?
-                        `https://github.com/${owner}/${repository}/actions/runs/${data.split('.')[0]}` : null;
+                    const buildRef = formatBuildReference(build?.run_id, build?.run_number, build?.run_attempt);
+                    return owner && repository && buildRef ?
+                        `https://github.com/${owner}/${repository}/actions/runs/${buildRef.split('.')[0]}` : null;
                 case 'commit':
-                    return owner && repository && data ?
-                        `https://github.com/${owner}/${repository}/commit/${data}` : null;
+                    return owner && repository && build?.revision ?
+                        `https://github.com/${owner}/${repository}/commit/${build.revision}` : null;
                 case 'workflow':
-                    return owner && repository && data ?
-                        `https://github.com/${owner}/${repository}/blob/main/.github/workflows/${data}` : null;
+                    const workflow = extractWorkflowName(build?.workflow_ref);
+                    return owner && repository && workflow ?
+                        `https://github.com/${owner}/${repository}/blob/main/.github/workflows/${workflow}` : null;
                 case 'team':
                     return owner && project?.team?.slug ?
                         `https://github.com/orgs/${owner}/teams/${project.team.slug}` : null;
@@ -674,16 +679,16 @@
             // Team information
             if (project?.team) {
                 updateElement('team-code', project.team.code,
-                    generateGitHubLink('team', null, build?.owner, build?.repository, project));
+                    generateGitHubLink('team', build, project));
                 updateElement('team-slug', project.team.slug);
             }
 
             // Organization and repository
             updateElement('organisation', build?.owner,
-                generateGitHubLink('organisation', build?.owner, build?.owner, build?.repository, project));
+                generateGitHubLink('organisation', build, project));
 
             updateElement('repository', build?.repository,
-                generateGitHubLink('repository', build?.repository, build?.owner, build?.repository, project));
+                generateGitHubLink('repository', build, project));
 
             // Build information
             const buildRef = formatBuildReference(build?.run_id, build?.run_number, build?.run_attempt);
@@ -692,20 +697,20 @@
 
             if (build?.version) {
                 updateElement('version', build.version,
-                    generateGitHubLink('version', build.version, build?.owner, build?.repository, project));
+                    generateGitHubLink('version', build, project));
             } else {
                 const versionEl = document.getElementById('version');
                 if (versionEl) versionEl.parentElement.style.display = 'none';
             }
 
             updateElement('build-reference', buildRef,
-                generateGitHubLink('build-reference', buildRef, build?.owner, build?.repository, project));
+                generateGitHubLink('build-reference', build, project));
 
             updateElement('branch', build?.ref_name);
 
             if (build?.revision) {
                 updateElement('revision', build.revision.substring(0, 7),
-                    generateGitHubLink('commit', build.revision, build?.owner, build?.repository, project));
+                    generateGitHubLink('commit', build, project));
             }
 
             updateElement('actor', build?.actor);
@@ -713,7 +718,7 @@
 
             if (workflow) {
                 updateElement('workflow', workflow,
-                    generateGitHubLink('workflow', workflow, build?.owner, build?.repository, project));
+                    generateGitHubLink('workflow', build, project));
             }
 
             if (build?.captured_at) {
