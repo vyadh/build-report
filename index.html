@@ -658,12 +658,6 @@
 
         // Fetch and merge data from all files
         Promise.all([
-            fetch('build-report-data.json').then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok for build-report-data.json');
-                }
-                return response.json();
-            }),
             fetch('project.json').then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok for project.json');
@@ -677,9 +671,9 @@
                 return response.json();
             })
         ])
-        .then(([buildReportData, projectData, buildData]) => {
-            // Create a merged data object starting with build report data
-            const mergedData = { ...buildReportData };
+        .then(([projectData, buildData]) => {
+            // Create a merged data object
+            const mergedData = {};
 
             // Replace project data with data from project.json
             if (projectData.project) {
