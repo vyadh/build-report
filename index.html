@@ -452,8 +452,8 @@
             <h3 class="section-title">Technology Stack</h3>
             <div class="info-list">
                 <div class="info-item">
-                    <div class="item-label">Platform</div>
-                    <div class="item-value" id="platform"></div>
+                    <div class="item-label">Delivery</div>
+                    <div class="item-value" id="delivery"></div>
                 </div>
 
                 <div class="info-item">
@@ -467,11 +467,6 @@
                 <div class="info-item">
                     <div class="item-label">Build System</div>
                     <div class="item-value" id="build-system"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Delivery</div>
-                    <div class="item-value" id="delivery"></div>
                 </div>
             </div>
         </div>
@@ -796,7 +791,11 @@
                         switch(asset.type.toLowerCase()) {
                             case 'container-image':
                                 artifact.icon = 'image';
-                                artifact.type = 'Docker Image';
+                                artifact.type = 'Container Image';
+                                break;
+                            case 'helm-chart':
+                                artifact.icon = 'insert_chart';
+                                artifact.type = 'Helm Chart';
                                 break;
                             case 'jar':
                                 artifact.icon = 'code';

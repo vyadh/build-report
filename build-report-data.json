@@ -1,5 +1,4 @@
 {
-  "platform": "Java",
   "artifacts": [
     {
       "name": "hello-world-1.2.3.jar",
@@ -31,6 +30,5 @@
       "icon": "insert_chart",
       "url": "https://charts.example.com/hello-world-1.2.3.tgz"
     }
-  ],
-  "generation_time": "2025-05-22 07:13:57"
+  ]
 }

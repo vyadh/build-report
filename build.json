@@ -25,6 +25,11 @@
       {
         "name": "libs/dpe/sample-app.jar",
         "type": "jar"
+      },
+      {
+        "name": "hello-world-1.2.3.tgz",
+        "type": "helm-chart",
+        "icon": "insert_chart"
       }
     ]
   }
