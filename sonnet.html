@@ -661,7 +661,7 @@
             }
         }
 
-        // Fetch and merge data from both files
+        // Fetch and merge data from all files
         Promise.all([
             fetch('build-report-data.json').then(response => {
                 if (!response.ok) {
@@ -674,11 +674,17 @@
                     throw new Error('Network response was not ok for project.json');
                 }
                 return response.json();
+            }),
+            fetch('build.json').then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok for build.json');
+                }
+                return response.json();
             })
         ])
-        .then(([buildData, projectData]) => {
-            // Create a merged data object
-            const mergedData = { ...buildData };
+        .then(([buildReportData, projectData, buildData]) => {
+            // Create a merged data object starting with build report data
+            const mergedData = { ...buildReportData };
 
             // Replace project data with data from project.json
             if (projectData.project) {
@@ -729,6 +735,77 @@
                     if (refs.jira) mergedData.issue_tracking = refs.jira;
                     if (refs.servicenow) mergedData.change_management = refs.servicenow;
                     if (refs.team_city) mergedData.team_city = refs.team_city;
+                }
+            }
+
+            // Replace build data with data from build.json
+            if (buildData.build) {
+                // Organization and repository
+                if (buildData.build.owner) mergedData.organisation = buildData.build.owner;
+                if (buildData.build.repository) mergedData.repository = buildData.build.repository;
+
+                // Branch information
+                if (buildData.build.ref_name) mergedData.branch = buildData.build.ref_name;
+                if (buildData.build.protected_branch !== undefined) {
+                    mergedData.protected_branch = buildData.build.protected_branch ? "Yes" : "No";
+                }
+
+                // Build details
+                if (buildData.build.revision) mergedData.revision = buildData.build.revision;
+                if (buildData.build.actor) mergedData.actor = buildData.build.actor;
+                if (buildData.build.runner) mergedData.runner = buildData.build.runner;
+
+                // Run information
+                if (buildData.build.run_id) {
+                    const runId = buildData.build.run_id;
+                    const runNumber = buildData.build.run_number;
+                    const runAttempt = buildData.build.run_attempt;
+                    mergedData.build_reference = `${runId}.${runNumber}.${runAttempt}`;
+                }
+
+                // Workflow information
+                if (buildData.build.workflow_ref) {
+                    // Extract the workflow file name from the workflow reference
+                    const workflowMatch = buildData.build.workflow_ref.match(/\.github\/workflows\/([^@]+)/);
+                    if (workflowMatch && workflowMatch[1]) {
+                        mergedData.workflow = workflowMatch[1];
+                    }
+                }
+
+                // Timestamp
+                if (buildData.build.captured_at) mergedData.timestamp = buildData.build.captured_at;
+
+                // Maturity (snapshot or release)
+                if (buildData.build.snapshot !== undefined) {
+                    mergedData.maturity = buildData.build.snapshot ? "Snapshot" : "Release";
+                }
+
+                // Process assets as artifacts if build-report-data.json doesn't have them
+                if (buildData.build.assets && (!mergedData.artifacts || mergedData.artifacts.length === 0)) {
+                    mergedData.artifacts = buildData.build.assets.map(asset => {
+                        // Create a default artifact representation
+                        const artifact = {
+                            name: asset.name,
+                            type: asset.type,
+                            url: '#' // Default URL
+                        };
+
+                        // Set appropriate icon based on type
+                        switch(asset.type.toLowerCase()) {
+                            case 'container-image':
+                                artifact.icon = 'image';
+                                artifact.type = 'Docker Image';
+                                break;
+                            case 'jar':
+                                artifact.icon = 'code';
+                                artifact.type = 'JAR';
+                                break;
+                            default:
+                                artifact.icon = 'file_present';
+                        }
+
+                        return artifact;
+                    });
                 }
             }
 

@@ -1,0 +1,30 @@
+{
+  "build": {
+    "source": "github",
+    "owner": "myorg",
+    "repository": "dpe-hello-world",
+    "ref": "refs/heads/main",
+    "ref_name": "main",
+    "revision": "84a3df9c2e1a9b4e5f8c7d6b3a2e1f0",
+    "actor": "vyadh",
+    "workflow_ref": "myorg/repo/.github/workflows/build.yml@refs/heads/main",
+    "workflow_revision": "1fa7ec9c2e1a9b4e5f8c7d6b39cea24",
+    "run_id": "111122233",
+    "run_number": 3,
+    "run_attempt": 1,
+    "protected_branch": true,
+    "snapshot": true,
+    "runner": "myorg-runner-2",
+    "captured_at": "2025-05-22T05:14:32Z",
+    "assets": [
+      {
+        "name": "myorg/dpe/sample-app:1.0.1",
+        "type": "container-image"
+      },
+      {
+        "name": "libs/dpe/sample-app.jar",
+        "type": "jar"
+      }
+    ]
+  }
+}
