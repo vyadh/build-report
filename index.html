@@ -647,6 +647,17 @@
             };
         }
 
+        // Function to handle info items - updates value and shows/hides based on existence
+        function updateInfoItem(id, value, condition) {
+            const item = document.getElementById(id)?.closest('.info-item');
+            if (condition) {
+                updateElement(id, value);
+                if (item) item.style.display = '';
+            } else {
+                if (item) item.style.display = 'none';
+            }
+        }
+
         // Load and process data
         Promise.all([
             fetch('project.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load project.json')),
@@ -731,9 +742,13 @@
 
             // Delivery information
             updateElement('delivery-type', "Deployment");
-            updateElement('destination', "Kubernetes");
-            updateElement('namespace', project?.delivery?.deploy?.kubernetes?.namespace);
-            updateElement('mechanism', project?.delivery?.deploy?.kubernetes?.type);
+
+            // Update and show destination, namespace, and mechanism if present
+            updateInfoItem('destination', 'Kubernetes', project?.delivery?.deploy?.kubernetes);
+            updateInfoItem('namespace', project?.delivery?.deploy?.kubernetes?.namespace,
+                               project?.delivery?.deploy?.kubernetes?.namespace);
+            updateInfoItem('mechanism', project?.delivery?.deploy?.kubernetes?.type,
+                              project?.delivery?.deploy?.kubernetes?.type);
 
             // Handle languages
             if (project?.languages?.length) {
