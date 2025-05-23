@@ -12,7 +12,8 @@
     },
 
     "team": {
-      "code": "dpe"
+      "code": "dpe",
+      "slug": "development-platform-engineering"
     },
 
     "languages": [
@@ -45,3 +46,4 @@
     }
   }
 }
+

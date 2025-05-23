@@ -1,7 +1,4 @@
 {
-  "team": {
-    "slug": "development-platform-engineering"
-  },
   "version": "v1.2.3",
   "platform": "Java",
   "artifacts": [
