@@ -559,79 +559,146 @@
             }
         }
 
-        // Function to update the report with merged data
-        function updateReportData(data) {
+        // Helper functions for formatted data
+
+        // Format delivery information from project data
+        function formatDelivery(project) {
+            const delivery = project?.delivery;
+            if (!delivery) return null;
+
+            if (typeof delivery === 'object') {
+                if (delivery.deploy?.kubernetes) {
+                    const k8s = delivery.deploy.kubernetes;
+                    return `Kubernetes (${k8s.type}) [${k8s.namespace}]`;
+                } else if (delivery.promote) {
+                    return delivery.promote;
+                }
+            }
+            return delivery;
+        }
+
+        // Extract workflow name from workflow reference
+        function extractWorkflowName(workflowRef) {
+            if (!workflowRef) return null;
+            const match = workflowRef.match(/\.github\/workflows\/([^@]+)/);
+            return match?.[1] || null;
+        }
+
+        // Format build reference from run information
+        function formatBuildReference(runId, runNumber, runAttempt) {
+            if (!runId) return null;
+            return `${runId}.${runNumber}.${runAttempt}`;
+        }
+
+        // Format maturity from snapshot flag
+        function formatMaturity(snapshotFlag) {
+            if (snapshotFlag === undefined) return null;
+            return snapshotFlag ? "Snapshot" : "Release";
+        }
+
+        // Process asset to artifact with proper icon
+        function processArtifact(asset) {
+            const { icon, label } = getArtifactIcon(asset.type);
+            return {
+                name: asset.name,
+                type: label || asset.type,
+                icon: icon,
+                url: asset.url || '#'
+            };
+        }
+
+        // Load and process data
+        Promise.all([
+            fetch('project.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load project.json')),
+            fetch('build.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load build.json'))
+        ])
+        .then(([projectData, buildData]) => {
+            // Keep data sources separate and render the report
+            renderReport(projectData.project, buildData.build);
+        })
+        .catch(error => {
+            console.error('Error loading report data:', error);
+        });
+
+        // Function to render the report using the separate data sources
+        function renderReport(project, build) {
             // Project information
-            updateElement('project-id', data.id);
-            updateElement('project-name', data.name);
-            updateElement('project-description', data.description);
-            updateElement('project-type', data.type);
+            updateElement('project-id', project?.id);
+            updateElement('project-name', project?.name);
+            updateElement('project-description', project?.description);
+            updateElement('project-type', project?.type);
 
             // Application information
-            if (data.application) {
-                updateElement('application-id', data.application.id);
-                updateElement('application-name', data.application.name);
-                updateElement('application-idip', data.application.idip);
+            if (project?.application) {
+                updateElement('application-id', project.application.id);
+                updateElement('application-name', project.application.name);
+                updateElement('application-idip', project.application.idip);
             }
 
-            // Team and organization
-            if (data.team) {
-                updateElement('team-code', data.team.code,
-                    data.organisation ? `https://github.com/orgs/${data.organisation}/teams/${data.team.slug}` : null);
-                updateElement('team-slug', data.team.slug);
+            // Team information
+            if (project?.team) {
+                updateElement('team-code', project.team.code,
+                    build?.owner ? `https://github.com/orgs/${build.owner}/teams/${project.team.slug}` : null);
+                updateElement('team-slug', project.team.slug);
             }
 
-            updateElement('organisation', data.organisation,
-                data.organisation ? `https://github.com/${data.organisation}` : null);
+            // Organization and repository
+            updateElement('organisation', build?.owner,
+                build?.owner ? `https://github.com/${build.owner}` : null);
 
-            updateElement('repository', data.repository,
-                data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}` : null);
+            updateElement('repository', build?.repository,
+                build?.owner && build?.repository ? `https://github.com/${build.owner}/${build.repository}` : null);
 
             // Build information
-            if (data.version) {
-                updateElement('version', data.version,
-                    data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}` : null);
+            const buildRef = formatBuildReference(build?.run_id, build?.run_number, build?.run_attempt);
+            const workflow = extractWorkflowName(build?.workflow_ref);
+            const maturity = formatMaturity(build?.snapshot);
+
+            if (build?.version) {
+                updateElement('version', build.version,
+                    build?.owner && build?.repository ? `https://github.com/${build.owner}/${build.repository}/releases/tag/v${build.version}` : null);
             } else {
                 const versionEl = document.getElementById('version');
                 if (versionEl) versionEl.parentElement.style.display = 'none';
             }
 
-            updateElement('build-reference', data.build_reference,
-                data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.build_reference?.split('.')[0]}` : null);
+            updateElement('build-reference', buildRef,
+                build?.owner && build?.repository && buildRef ?
+                    `https://github.com/${build.owner}/${build.repository}/actions/runs/${buildRef?.split('.')[0]}` : null);
 
-            updateElement('branch', data.branch);
+            updateElement('branch', build?.ref_name);
 
-            if (data.revision) {
-                updateElement('revision', data.revision.substring(0, 7),
-                    data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}/commit/${data.revision}` : null);
+            if (build?.revision) {
+                updateElement('revision', build.revision.substring(0, 7),
+                    build?.owner && build?.repository ? `https://github.com/${build.owner}/${build.repository}/commit/${build.revision}` : null);
             }
 
-            updateElement('actor', data.actor);
-            updateElement('runner', data.runner);
+            updateElement('actor', build?.actor);
+            updateElement('runner', build?.runner);
 
-            if (data.workflow) {
-                updateElement('workflow', data.workflow,
-                    data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}/blob/main/.github/workflows/${data.workflow}` : null);
+            if (workflow) {
+                updateElement('workflow', workflow,
+                    build?.owner && build?.repository ? `https://github.com/${build.owner}/${build.repository}/blob/main/.github/workflows/${workflow}` : null);
             }
 
-            if (data.timestamp) {
-                const date = new Date(data.timestamp);
+            if (build?.captured_at) {
+                const date = new Date(build.captured_at);
                 updateElement('timestamp', date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'long' }));
             }
 
-            updateElement('project-maturity', data.maturity);
+            updateElement('project-maturity', maturity);
 
             // Technology information
-            updateElement('platform', data.platform);
-            updateElement('build-system', data.build_system);
-            updateElement('delivery', data.delivery);
+            updateElement('platform', build?.platform);
+            updateElement('build-system', project?.build_system);
+            updateElement('delivery', formatDelivery(project));
 
             // Handle languages
-            if (data.languages?.length) {
+            if (project?.languages?.length) {
                 const langContainer = document.getElementById('languages');
                 if (langContainer) {
                     langContainer.innerHTML = '';
-                    data.languages.forEach(lang => {
+                    project.languages.forEach(lang => {
                         const tagSpan = document.createElement('span');
                         tagSpan.className = 'tag';
                         tagSpan.textContent = lang;
@@ -641,141 +708,28 @@
             }
 
             // Integration information
-            updateElement('issue-tracking', data.issue_tracking,
-                data.issue_tracking ? `https://jira.example.com/projects/${data.issue_tracking}` : null);
+            updateElement('issue-tracking', project?.references?.jira,
+                project?.references?.jira ? `https://jira.example.com/projects/${project.references.jira}` : null);
 
-            updateElement('change-management', data.change_management,
-                data.change_management ? `https://servicenow.example.com/item/${data.change_management}` : null);
+            updateElement('change-management', project?.references?.servicenow,
+                project?.references?.servicenow ? `https://servicenow.example.com/item/${project.references.servicenow}` : null);
 
-            updateElement('team-city', data.team_city,
-                data.team_city ? `https://teamcity.example.com/project/${data.team_city}` : null);
+            updateElement('team-city', project?.references?.team_city,
+                project?.references?.team_city ? `https://teamcity.example.com/project/${project.references.team_city}` : null);
 
             // Artifacts
-            if (data.artifacts?.length > 0) {
+            if (build?.assets?.length > 0) {
                 const artifactsContainer = document.querySelector('.artifacts-list');
                 if (artifactsContainer) {
                     artifactsContainer.innerHTML = '';
 
-                    data.artifacts.forEach(artifact => {
-                        // Enhance artifact with proper icon if needed
-                        if (!artifact.icon) {
-                            const { icon, label } = getArtifactIcon(artifact.type);
-                            artifact.icon = icon;
-                            if (!artifact.type) artifact.type = label;
-                        }
-
+                    const artifacts = build.assets.map(processArtifact);
+                    artifacts.forEach(artifact => {
                         artifactsContainer.appendChild(createArtifactElement(artifact));
                     });
                 }
             }
         }
-
-        // Load and process data
-        Promise.all([
-            fetch('project.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load project.json')),
-            fetch('build.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load build.json'))
-        ])
-        .then(([projectData, buildData]) => {
-            // Create merged data using direct property assignments rather than spreading
-            const mergedData = {};
-
-            // Project information
-            if (projectData.project) {
-                mergedData.id = projectData.project.id;
-                mergedData.name = projectData.project.name;
-                mergedData.description = projectData.project.description;
-                mergedData.type = projectData.project.type;
-                mergedData.build_system = projectData.project.build_system;
-
-                // Application
-                mergedData.application = projectData.project.application;
-
-                // Team
-                mergedData.team = projectData.project.team;
-
-                // Languages (keep as array)
-                mergedData.languages = projectData.project.languages;
-
-                // Process delivery information
-                const delivery = projectData.project.delivery;
-                if (delivery) {
-                    if (typeof delivery === 'object') {
-                        if (delivery.deploy && delivery.deploy.kubernetes) {
-                            const k8s = delivery.deploy.kubernetes;
-                            mergedData.delivery = `Kubernetes (${k8s.type}) [${k8s.namespace}]`;
-                        } else if (delivery.promote) {
-                            mergedData.delivery = delivery.promote;
-                        }
-                    } else {
-                        mergedData.delivery = delivery;
-                    }
-                }
-
-                // Extract references
-                if (projectData.project.references) {
-                    mergedData.issue_tracking = projectData.project.references.jira;
-                    mergedData.change_management = projectData.project.references.servicenow;
-                    mergedData.team_city = projectData.project.references.team_city;
-                }
-            }
-
-            // Build information
-            if (buildData.build) {
-                mergedData.platform = buildData.build.platform;
-                mergedData.repository = buildData.build.repository;
-                mergedData.branch = buildData.build.ref_name;
-                mergedData.revision = buildData.build.revision;
-                mergedData.actor = buildData.build.actor;
-                mergedData.runner = buildData.build.runner;
-                mergedData.version = buildData.build.version;
-                mergedData.timestamp = buildData.build.captured_at;
-
-                // Map organization property
-                mergedData.organisation = buildData.build.owner;
-
-                // Format protected branch info
-                if (buildData.build.protected_branch !== undefined) {
-                    mergedData.protected_branch = buildData.build.protected_branch ? "Yes" : "No";
-                }
-
-                // Build run reference
-                if (buildData.build.run_id) {
-                    mergedData.build_reference =
-                        `${buildData.build.run_id}.${buildData.build.run_number}.${buildData.build.run_attempt}`;
-                }
-
-                // Extract workflow name
-                if (buildData.build.workflow_ref) {
-                    const match = buildData.build.workflow_ref.match(/\.github\/workflows\/([^@]+)/);
-                    if (match && match[1]) {
-                        mergedData.workflow = match[1];
-                    }
-                }
-
-                // Format maturity
-                if (buildData.build.snapshot !== undefined) {
-                    mergedData.maturity = buildData.build.snapshot ? "Snapshot" : "Release";
-                }
-
-                // Process artifacts
-                if (buildData.build.assets && buildData.build.assets.length > 0) {
-                    mergedData.artifacts = buildData.build.assets.map(asset => {
-                        const { icon, label } = getArtifactIcon(asset.type);
-                        return {
-                            name: asset.name,
-                            type: label || asset.type,
-                            icon: icon,
-                            url: asset.url || '#'
-                        };
-                    });
-                }
-            }
-
-            updateReportData(mergedData);
-        })
-        .catch(error => {
-            console.error('Error loading report data:', error);
-        });
     });
 </script>
 
