@@ -513,293 +513,262 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Function to update the report with data
+        // Helper function to update element text and optionally set href
+        function updateElement(id, value, hrefTemplate = null) {
+            if (!value) return;
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            el.textContent = value;
+            if (hrefTemplate) el.href = hrefTemplate;
+        }
+
+        // Helper function to create artifact element
+        function createArtifactElement(artifact) {
+            const { name, type, url, icon = 'file_present' } = artifact;
+
+            const artifactItem = document.createElement('a');
+            artifactItem.href = url || '#';
+            artifactItem.className = 'artifact-item';
+            artifactItem.target = '_blank';
+
+            artifactItem.innerHTML = `
+                <div class="artifact-icon"><span class="material-icons">${icon}</span></div>
+                <div class="artifact-info">
+                    <div class="artifact-name">${name}</div>
+                    <div class="artifact-type">${type}</div>
+                </div>
+            `;
+
+            return artifactItem;
+        }
+
+        // Get icon for artifact based on type
+        function getArtifactIcon(type) {
+            const typeMap = {
+                'container-image': { icon: 'image', label: 'Container Image' },
+                'helm-chart': { icon: 'insert_chart', label: 'Helm Chart' },
+                'jar': { icon: 'code', label: 'JAR' },
+                'documentation': { icon: 'description', label: 'Documentation' },
+                'source': { icon: 'source', label: 'Source' }
+            };
+
+            return typeMap[type.toLowerCase()] || { icon: 'file_present', label: type };
+        }
+
+        // Function to update the report with merged data
         function updateReportData(data) {
-            // Update project information
-            if (data.project && data.project.id) document.getElementById('project-id').textContent = data.project.id;
-            if (data.project && data.project.name) document.getElementById('project-name').textContent = data.project.name;
-            if (data.project && data.project.description) document.getElementById('project-description').textContent = data.project.description;
-            if (data.project && data.project.type) document.getElementById('project-type').textContent = data.project.type;
-
-            // Update application information
-            if (data.application && data.application.id) document.getElementById('application-id').textContent = data.application.id;
-            if (data.application && data.application.name) document.getElementById('application-name').textContent = data.application.name;
-            if (data.application && data.application.idip) document.getElementById('application-idip').textContent = data.application.idip;
-
-            // Update team and organization information
-            if (data.team && data.team.code) {
-                const teamCodeEl = document.getElementById('team-code');
-                teamCodeEl.textContent = data.team.code;
-                teamCodeEl.href = `https://github.com/orgs/${data.organisation}/teams/${data.team.slug}`;
-            }
-            if (data.team && data.team.slug) document.getElementById('team-slug').textContent = data.team.slug;
-            if (data.organisation) {
-                const orgEl = document.getElementById('organisation');
-                orgEl.textContent = data.organisation;
-                orgEl.href = `https://github.com/${data.organisation}`;
-            }
-            if (data.repository) {
-                const repoEl = document.getElementById('repository');
-                repoEl.textContent = data.repository;
-                repoEl.href = `https://github.com/${data.organisation}/${data.repository}`;
+            // Project information
+            if (data.project) {
+                updateElement('project-id', data.project.id);
+                updateElement('project-name', data.project.name);
+                updateElement('project-description', data.project.description);
+                updateElement('project-type', data.project.type);
             }
 
-            // Update build information
+            // Application information
+            if (data.application) {
+                updateElement('application-id', data.application.id);
+                updateElement('application-name', data.application.name);
+                updateElement('application-idip', data.application.idip);
+            }
+
+            // Team and organization
+            if (data.team) {
+                updateElement('team-code', data.team.code,
+                    data.organisation ? `https://github.com/orgs/${data.organisation}/teams/${data.team.slug}` : null);
+                updateElement('team-slug', data.team.slug);
+            }
+
+            updateElement('organisation', data.organisation,
+                data.organisation ? `https://github.com/${data.organisation}` : null);
+
+            updateElement('repository', data.repository,
+                data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}` : null);
+
+            // Build information
             if (data.version) {
+                updateElement('version', data.version,
+                    data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}` : null);
+            } else {
                 const versionEl = document.getElementById('version');
-                versionEl.textContent = data.version;
-                if (data.organisation && data.repository) {
-                    versionEl.href = `https://github.com/${data.organisation}/${data.repository}/releases/tag/v${data.version}`;
-                }
-                if (!data.version) {
-                    versionEl.parentElement.style.display = 'none';
-                }
+                if (versionEl) versionEl.parentElement.style.display = 'none';
             }
-            if (data.build_reference) {
-                const buildRefEl = document.getElementById('build-reference');
-                buildRefEl.textContent = data.build_reference;
-                if (data.organisation && data.repository) {
-                    buildRefEl.href = `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.build_reference.split('.')[0]}`;
-                }
-            }
-            if (data.branch) document.getElementById('branch').textContent = data.branch;
+
+            updateElement('build-reference', data.build_reference,
+                data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}/actions/runs/${data.build_reference?.split('.')[0]}` : null);
+
+            updateElement('branch', data.branch);
+
             if (data.revision) {
-                const revisionEl = document.getElementById('revision');
-                revisionEl.textContent = data.revision.substring(0, 7);
-                if (data.organisation && data.repository) {
-                    revisionEl.href = `https://github.com/${data.organisation}/${data.repository}/commit/${data.revision}`;
-                }
+                updateElement('revision', data.revision.substring(0, 7),
+                    data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}/commit/${data.revision}` : null);
             }
-            if (data.actor) document.getElementById('actor').textContent = data.actor;
+
+            updateElement('actor', data.actor);
+            updateElement('runner', data.runner);
+
             if (data.workflow) {
-                const workflowEl = document.getElementById('workflow');
-                workflowEl.textContent = data.workflow;
-                if (data.organisation && data.repository) {
-                    workflowEl.href = `https://github.com/${data.organisation}/${data.repository}/blob/main/.github/workflows/${data.workflow}`;
-                }
+                updateElement('workflow', data.workflow,
+                    data.organisation && data.repository ? `https://github.com/${data.organisation}/${data.repository}/blob/main/.github/workflows/${data.workflow}` : null);
             }
-            if (data.runner) document.getElementById('runner').textContent = data.runner;
 
             if (data.timestamp) {
                 const date = new Date(data.timestamp);
-                document.getElementById('timestamp').textContent = date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'long' });
+                updateElement('timestamp', date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'long' }));
             }
 
-            if (data.maturity) document.getElementById('project-maturity').textContent = data.maturity;
+            updateElement('project-maturity', data.maturity);
 
-            // Update technology information
-            if (data.platform) document.getElementById('platform').textContent = data.platform;
+            // Technology information
+            updateElement('platform', data.platform);
+            updateElement('build-system', data.build_system);
+            updateElement('delivery', data.delivery);
+
+            // Handle languages
             if (data.languages) {
                 const langContainer = document.getElementById('languages');
-                langContainer.innerHTML = '';
-                data.languages.split(', ').forEach(lang => {
-                    const tagSpan = document.createElement('span');
-                    tagSpan.className = 'tag';
-                    tagSpan.textContent = lang;
-                    langContainer.appendChild(tagSpan);
-                });
-            }
-            if (data.build_system) document.getElementById('build-system').textContent = data.build_system;
-            if (data.delivery) document.getElementById('delivery').textContent = data.delivery;
-
-            // Update integration information
-            if (data.issue_tracking) {
-                const issueTrackingEl = document.getElementById('issue-tracking');
-                issueTrackingEl.textContent = data.issue_tracking;
-                issueTrackingEl.href = `https://jira.example.com/projects/${data.issue_tracking}`;
-            }
-            if (data.change_management) {
-                const changeManagementEl = document.getElementById('change-management');
-                changeManagementEl.textContent = data.change_management;
-                changeManagementEl.href = `https://servicenow.example.com/item/${data.change_management}`;
-            }
-            if (data.team_city) {
-                const teamCityEl = document.getElementById('team-city');
-                teamCityEl.textContent = data.team_city;
-                teamCityEl.href = `https://teamcity.example.com/project/${data.team_city}`;
+                if (langContainer) {
+                    langContainer.innerHTML = '';
+                    data.languages.split(', ').forEach(lang => {
+                        const tagSpan = document.createElement('span');
+                        tagSpan.className = 'tag';
+                        tagSpan.textContent = lang;
+                        langContainer.appendChild(tagSpan);
+                    });
+                }
             }
 
-            // Update artifacts
-            if (data.artifacts && data.artifacts.length > 0) {
+            // Integration information
+            updateElement('issue-tracking', data.issue_tracking,
+                data.issue_tracking ? `https://jira.example.com/projects/${data.issue_tracking}` : null);
+
+            updateElement('change-management', data.change_management,
+                data.change_management ? `https://servicenow.example.com/item/${data.change_management}` : null);
+
+            updateElement('team-city', data.team_city,
+                data.team_city ? `https://teamcity.example.com/project/${data.team_city}` : null);
+
+            // Artifacts
+            if (data.artifacts?.length > 0) {
                 const artifactsContainer = document.querySelector('.artifacts-list');
-                artifactsContainer.innerHTML = ''; // Clear existing artifacts
+                if (artifactsContainer) {
+                    artifactsContainer.innerHTML = '';
 
-                data.artifacts.forEach(artifact => {
-                    const artifactItem = document.createElement('a');
-                    artifactItem.href = artifact.url;
-                    artifactItem.className = 'artifact-item';
-                    artifactItem.target = '_blank'; // Open in new tab
+                    data.artifacts.forEach(artifact => {
+                        // Enhance artifact with proper icon if needed
+                        if (!artifact.icon) {
+                            const { icon, label } = getArtifactIcon(artifact.type);
+                            artifact.icon = icon;
+                            if (!artifact.type) artifact.type = label;
+                        }
 
-                    const artifactIcon = document.createElement('div');
-                    artifactIcon.className = 'artifact-icon';
-                    artifactIcon.innerHTML = `<span class="material-icons">${artifact.icon || 'file_present'}</span>`;
-
-                    const artifactInfo = document.createElement('div');
-                    artifactInfo.className = 'artifact-info';
-
-                    const artifactName = document.createElement('div');
-                    artifactName.className = 'artifact-name';
-                    artifactName.textContent = artifact.name;
-
-                    const artifactType = document.createElement('div');
-                    artifactType.className = 'artifact-type';
-                    artifactType.textContent = artifact.type;
-
-                    artifactInfo.appendChild(artifactName);
-                    artifactInfo.appendChild(artifactType);
-
-                    artifactItem.appendChild(artifactIcon);
-                    artifactItem.appendChild(artifactInfo);
-
-                    artifactsContainer.appendChild(artifactItem);
-                });
+                        artifactsContainer.appendChild(createArtifactElement(artifact));
+                    });
+                }
             }
         }
 
-        // Fetch and merge data from all files
+        // Load and process data
         Promise.all([
-            fetch('project.json').then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok for project.json');
-                }
-                return response.json();
-            }),
-            fetch('build.json').then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok for build.json');
-                }
-                return response.json();
-            })
+            fetch('project.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load project.json')),
+            fetch('build.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load build.json'))
         ])
         .then(([projectData, buildData]) => {
-            // Create a merged data object
             const mergedData = {};
 
-            // Replace project data with data from project.json
+            // Process project data
             if (projectData.project) {
-                mergedData.project = projectData.project;
+                // Extract project details
+                const { project } = projectData;
+                mergedData.project = project;
+                mergedData.application = project.application;
 
-                // Handle nested application data
-                if (projectData.project.application) {
-                    mergedData.application = projectData.project.application;
-                }
-
-                // Handle nested team data
-                if (projectData.project.team) {
+                // Handle team data
+                if (project.team) {
                     mergedData.team = {
-                        ...mergedData.team,
-                        code: projectData.project.team.code,
-                        slug: projectData.project.team.slug
+                        code: project.team.code,
+                        slug: project.team.slug
                     };
                 }
 
-                // Handle languages (convert array to comma-separated string)
-                if (projectData.project.languages && Array.isArray(projectData.project.languages)) {
-                    mergedData.languages = projectData.project.languages.join(', ');
+                // Convert languages array to string
+                if (project.languages?.length) {
+                    mergedData.languages = project.languages.join(', ');
                 }
 
-                // Handle build system
-                if (projectData.project.build_system) {
-                    mergedData.build_system = projectData.project.build_system;
-                }
+                // Copy build system
+                mergedData.build_system = project.build_system;
 
-                // Handle delivery information
-                if (projectData.project.delivery) {
-                    // Format delivery information based on the structure
-                    if (typeof projectData.project.delivery === 'object') {
-                        const delivery = projectData.project.delivery;
-                        if (delivery.deploy && delivery.deploy.kubernetes) {
+                // Format delivery information
+                if (project.delivery) {
+                    const delivery = project.delivery;
+                    if (typeof delivery === 'object') {
+                        if (delivery.deploy?.kubernetes) {
                             const k8s = delivery.deploy.kubernetes;
                             mergedData.delivery = `Kubernetes (${k8s.type}) [${k8s.namespace}]`;
                         } else if (delivery.promote) {
                             mergedData.delivery = delivery.promote;
                         }
                     } else {
-                        mergedData.delivery = projectData.project.delivery;
+                        mergedData.delivery = delivery;
                     }
                 }
 
-                // Handle references (integration information)
-                if (projectData.project.references) {
-                    const refs = projectData.project.references;
-                    if (refs.jira) mergedData.issue_tracking = refs.jira;
-                    if (refs.servicenow) mergedData.change_management = refs.servicenow;
-                    if (refs.team_city) mergedData.team_city = refs.team_city;
+                // Handle references/integrations
+                if (project.references) {
+                    const { jira, servicenow, team_city } = project.references;
+                    mergedData.issue_tracking = jira;
+                    mergedData.change_management = servicenow;
+                    mergedData.team_city = team_city;
                 }
             }
 
-            // Replace build data with data from build.json
+            // Process build data
             if (buildData.build) {
+                const { build } = buildData;
+
                 // Organization and repository
-                if (buildData.build.owner) mergedData.organisation = buildData.build.owner;
-                if (buildData.build.repository) mergedData.repository = buildData.build.repository;
+                mergedData.organisation = build.owner;
+                mergedData.repository = build.repository;
 
                 // Branch information
-                if (buildData.build.ref_name) mergedData.branch = buildData.build.ref_name;
-                if (buildData.build.protected_branch !== undefined) {
-                    mergedData.protected_branch = buildData.build.protected_branch ? "Yes" : "No";
+                mergedData.branch = build.ref_name;
+                if (build.protected_branch !== undefined) {
+                    mergedData.protected_branch = build.protected_branch ? "Yes" : "No";
                 }
 
                 // Build details
-                if (buildData.build.version) mergedData.version = buildData.build.version;
-                if (buildData.build.revision) mergedData.revision = buildData.build.revision;
-                if (buildData.build.actor) mergedData.actor = buildData.build.actor;
-                if (buildData.build.runner) mergedData.runner = buildData.build.runner;
+                mergedData.version = build.version;
+                mergedData.revision = build.revision;
+                mergedData.actor = build.actor;
+                mergedData.runner = build.runner;
 
                 // Run information
-                if (buildData.build.run_id) {
-                    const runId = buildData.build.run_id;
-                    const runNumber = buildData.build.run_number;
-                    const runAttempt = buildData.build.run_attempt;
-                    mergedData.build_reference = `${runId}.${runNumber}.${runAttempt}`;
+                if (build.run_id) {
+                    mergedData.build_reference = `${build.run_id}.${build.run_number}.${build.run_attempt}`;
                 }
 
                 // Workflow information
-                if (buildData.build.workflow_ref) {
-                    // Extract the workflow file name from the workflow reference
-                    const workflowMatch = buildData.build.workflow_ref.match(/\.github\/workflows\/([^@]+)/);
-                    if (workflowMatch && workflowMatch[1]) {
-                        mergedData.workflow = workflowMatch[1];
-                    }
+                if (build.workflow_ref) {
+                    const workflowMatch = build.workflow_ref.match(/\.github\/workflows\/([^@]+)/);
+                    mergedData.workflow = workflowMatch?.[1];
                 }
 
-                // Timestamp
-                if (buildData.build.captured_at) mergedData.timestamp = buildData.build.captured_at;
+                // Other build information
+                mergedData.timestamp = build.captured_at;
+                mergedData.maturity = build.snapshot !== undefined ? (build.snapshot ? "Snapshot" : "Release") : null;
 
-                // Maturity (snapshot or release)
-                if (buildData.build.snapshot !== undefined) {
-                    mergedData.maturity = buildData.build.snapshot ? "Snapshot" : "Release";
-                }
-
-                // Process assets as artifacts if build-report-data.json doesn't have them
-                if (buildData.build.assets && (!mergedData.artifacts || mergedData.artifacts.length === 0)) {
-                    mergedData.artifacts = buildData.build.assets.map(asset => {
-                        // Create a default artifact representation
-                        const artifact = {
+                // Convert assets to artifacts
+                if (build.assets?.length) {
+                    mergedData.artifacts = build.assets.map(asset => {
+                        const { icon, label } = getArtifactIcon(asset.type);
+                        return {
                             name: asset.name,
-                            type: asset.type,
-                            url: '#' // Default URL
+                            type: label || asset.type,
+                            icon: icon,
+                            url: asset.url || '#'
                         };
-
-                        // Set appropriate icon based on type
-                        switch(asset.type.toLowerCase()) {
-                            case 'container-image':
-                                artifact.icon = 'image';
-                                artifact.type = 'Container Image';
-                                break;
-                            case 'helm-chart':
-                                artifact.icon = 'insert_chart';
-                                artifact.type = 'Helm Chart';
-                                break;
-                            case 'jar':
-                                artifact.icon = 'code';
-                                artifact.type = 'JAR';
-                                break;
-                            default:
-                                artifact.icon = 'file_present';
-                        }
-
-                        return artifact;
                     });
                 }
             }
