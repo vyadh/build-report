@@ -13,8 +13,8 @@
     "run_id": "111122233",
     "run_number": 3,
     "run_attempt": 1,
-    "protected_branch": true,
-    "snapshot": true,
+    "protected_branch": false,
+    "snapshot": false,
     "runner": "myorg-runner-2",
     "captured_at": "2025-05-22T05:14:32Z",
     "assets": [

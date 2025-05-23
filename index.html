@@ -117,7 +117,7 @@
 
         .badge-secondary {
             background-color: var(--accent-secondary);
-            color: var(--bg-primary);
+            color: var (--bg-primary);
         }
 
         .badge-success {
@@ -128,6 +128,11 @@
         .badge-warning {
             background-color: var(--warning);
             color: var(--bg-primary);
+        }
+
+        .badge-subtle {
+            background-color: var(--bg-tertiary);
+            color: var(--text-muted);
         }
 
         /* Build info sections */
@@ -200,7 +205,7 @@
         .item-label {
             color: var(--text-muted);
             font-size: 0.85rem;
-            margin-bottom: var(--spacing-xs);
+            margin-bottom: var (--spacing-xs);
         }
 
         .item-value {
@@ -373,7 +378,7 @@
                     <div class="card-label">Build Reference</div>
                     <div class="card-value">
                         <a href="#" target="_blank" id="build-reference"></a>
-                        <span class="badge badge-secondary" id="project-maturity"></span>
+                        <span class="badge" style="display: none" id="project-maturity"></span>
                     </div>
                 </div>
 
@@ -381,7 +386,7 @@
                     <div class="card-label">Branch</div>
                     <div class="card-value">
                         <span id="branch"></span>
-                        <span class="badge badge-success">Protected</span>
+                        <span class="badge" style="display: none" id="protection">Protected</span>
                     </div>
                 </div>
             </div>
@@ -614,12 +619,6 @@
             return `${runId}.${runNumber}.${runAttempt}`;
         }
 
-        // Format maturity from snapshot flag
-        function formatMaturity(snapshotFlag) {
-            if (snapshotFlag === undefined) return null;
-            return snapshotFlag ? "Snapshot" : "Release";
-        }
-
         // Process asset to artifact with proper icon
         function processArtifact(asset) {
             const { icon, label } = getArtifactIcon(asset.type);
@@ -704,7 +703,6 @@
             // Build information
             const buildRef = formatBuildReference(build?.run_id, build?.run_number, build?.run_attempt);
             const workflow = extractWorkflowName(build?.workflow_ref);
-            const maturity = formatMaturity(build?.snapshot);
 
             if (build?.version) {
                 updateElement('version', build.version, generateGitHubLink('version', build, project));
@@ -735,19 +733,29 @@
 
             updateElement('build-system', project?.build_system);
 
-            updateElement('project-maturity', maturity);
+            if (build?.protected_branch !== undefined) {
+                const protectionBadge = document.getElementById('protection');
+                protectionBadge.style.display = '';
 
-            // Update the maturity badge with appropriate styling based on snapshot value
-            if (maturity) {
-                const maturityEl = document.getElementById('project-maturity');
-                if (maturityEl) {
-                    maturityEl.textContent = maturity;
+                if (build.protected_branch) {
+                    protectionBadge.textContent = 'Protected';
+                    protectionBadge.classList.add('badge-success');
+                } else {
+                    protectionBadge.textContent = 'Unprotected';
+                    protectionBadge.classList.add('badge-subtle');
+                }
+            }
 
-                    // If snapshot is false (Release), use the green success color like branch protection
-                    if (!build?.snapshot) {
-                        maturityEl.classList.remove('badge-secondary');
-                        maturityEl.classList.add('badge-success');
-                    }
+            if (build?.snapshot !== undefined) {
+                const maturityBadge = document.getElementById('project-maturity');
+                maturityBadge.style.display = '';
+
+                if (build.snapshot) {
+                    maturityBadge.textContent = "Snapshot";
+                    maturityBadge.classList.add('badge-secondary');
+                } else {
+                    maturityBadge.textContent = "Release";
+                    maturityBadge.classList.add('badge-success');
                 }
             }
 
