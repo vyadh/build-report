@@ -559,7 +559,43 @@
             }
         }
 
-        // Helper functions for formatted data
+        function generateGitHubLink(type, data, owner, repository, project) {
+            switch (type) {
+                case 'organisation':
+                    return owner ? `https://github.com/${owner}` : null;
+                case 'repository':
+                    return owner && data ? `https://github.com/${owner}/${data}` : null;
+                case 'version':
+                    return owner && repository && data ?
+                        `https://github.com/${owner}/${repository}/releases/tag/v${data}` : null;
+                case 'build-reference':
+                    return owner && repository && data ?
+                        `https://github.com/${owner}/${repository}/actions/runs/${data.split('.')[0]}` : null;
+                case 'commit':
+                    return owner && repository && data ?
+                        `https://github.com/${owner}/${repository}/commit/${data}` : null;
+                case 'workflow':
+                    return owner && repository && data ?
+                        `https://github.com/${owner}/${repository}/blob/main/.github/workflows/${data}` : null;
+                case 'team':
+                    return owner && project?.team?.slug ?
+                        `https://github.com/orgs/${owner}/teams/${project.team.slug}` : null;
+                default:
+                    return null;
+            }
+        }
+
+        function generateJiraLink(data) {
+            return data ? `https://jira.example.com/projects/${data}` : null;
+        }
+
+        function generateServiceNowLink(data) {
+            return data ? `https://servicenow.example.com/item/${data}` : null;
+        }
+
+        function generateTeamCityLink(data) {
+            return data ? `https://teamcity.example.com/project/${data}` : null;
+        }
 
         // Format delivery information from project data
         function formatDelivery(project) {
@@ -638,16 +674,16 @@
             // Team information
             if (project?.team) {
                 updateElement('team-code', project.team.code,
-                    build?.owner ? `https://github.com/orgs/${build.owner}/teams/${project.team.slug}` : null);
+                    generateGitHubLink('team', null, build?.owner, build?.repository, project));
                 updateElement('team-slug', project.team.slug);
             }
 
             // Organization and repository
             updateElement('organisation', build?.owner,
-                build?.owner ? `https://github.com/${build.owner}` : null);
+                generateGitHubLink('organisation', build?.owner, build?.owner, build?.repository, project));
 
             updateElement('repository', build?.repository,
-                build?.owner && build?.repository ? `https://github.com/${build.owner}/${build.repository}` : null);
+                generateGitHubLink('repository', build?.repository, build?.owner, build?.repository, project));
 
             // Build information
             const buildRef = formatBuildReference(build?.run_id, build?.run_number, build?.run_attempt);
@@ -656,21 +692,20 @@
 
             if (build?.version) {
                 updateElement('version', build.version,
-                    build?.owner && build?.repository ? `https://github.com/${build.owner}/${build.repository}/releases/tag/v${build.version}` : null);
+                    generateGitHubLink('version', build.version, build?.owner, build?.repository, project));
             } else {
                 const versionEl = document.getElementById('version');
                 if (versionEl) versionEl.parentElement.style.display = 'none';
             }
 
             updateElement('build-reference', buildRef,
-                build?.owner && build?.repository && buildRef ?
-                    `https://github.com/${build.owner}/${build.repository}/actions/runs/${buildRef?.split('.')[0]}` : null);
+                generateGitHubLink('build-reference', buildRef, build?.owner, build?.repository, project));
 
             updateElement('branch', build?.ref_name);
 
             if (build?.revision) {
                 updateElement('revision', build.revision.substring(0, 7),
-                    build?.owner && build?.repository ? `https://github.com/${build.owner}/${build.repository}/commit/${build.revision}` : null);
+                    generateGitHubLink('commit', build.revision, build?.owner, build?.repository, project));
             }
 
             updateElement('actor', build?.actor);
@@ -678,7 +713,7 @@
 
             if (workflow) {
                 updateElement('workflow', workflow,
-                    build?.owner && build?.repository ? `https://github.com/${build.owner}/${build.repository}/blob/main/.github/workflows/${workflow}` : null);
+                    generateGitHubLink('workflow', workflow, build?.owner, build?.repository, project));
             }
 
             if (build?.captured_at) {
@@ -709,13 +744,13 @@
 
             // Integration information
             updateElement('issue-tracking', project?.references?.jira,
-                project?.references?.jira ? `https://jira.example.com/projects/${project.references.jira}` : null);
+                generateJiraLink(project?.references?.jira));
 
             updateElement('change-management', project?.references?.servicenow,
-                project?.references?.servicenow ? `https://servicenow.example.com/item/${project.references.servicenow}` : null);
+                generateServiceNowLink(project?.references?.servicenow));
 
             updateElement('team-city', project?.references?.team_city,
-                project?.references?.team_city ? `https://teamcity.example.com/project/${project.references.team_city}` : null);
+                generateTeamCityLink(project?.references?.team_city));
 
             // Artifacts
             if (build?.assets?.length > 0) {
