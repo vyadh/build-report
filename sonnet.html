@@ -661,20 +661,82 @@
             }
         }
 
-        // Fetch the JSON data from the file
-        fetch('build-report-data.json')
-            .then(response => {
+        // Fetch and merge data from both files
+        Promise.all([
+            fetch('build-report-data.json').then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('Network response was not ok for build-report-data.json');
+                }
+                return response.json();
+            }),
+            fetch('project.json').then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok for project.json');
                 }
                 return response.json();
             })
-            .then(data => {
-                updateReportData(data);
-            })
-            .catch(error => {
-                console.error('Error loading build report data:', error);
-            });
+        ])
+        .then(([buildData, projectData]) => {
+            // Create a merged data object
+            const mergedData = { ...buildData };
+
+            // Replace project data with data from project.json
+            if (projectData.project) {
+                mergedData.project = projectData.project;
+
+                // Handle nested application data
+                if (projectData.project.application) {
+                    mergedData.application = projectData.project.application;
+                }
+
+                // Handle nested team data
+                if (projectData.project.team) {
+                    mergedData.team = {
+                        ...mergedData.team,
+                        code: projectData.project.team.code
+                    };
+                }
+
+                // Handle languages (convert array to comma-separated string)
+                if (projectData.project.languages && Array.isArray(projectData.project.languages)) {
+                    mergedData.languages = projectData.project.languages.join(', ');
+                }
+
+                // Handle build system
+                if (projectData.project.build_system) {
+                    mergedData.build_system = projectData.project.build_system;
+                }
+
+                // Handle delivery information
+                if (projectData.project.delivery) {
+                    // Format delivery information based on the structure
+                    if (typeof projectData.project.delivery === 'object') {
+                        const delivery = projectData.project.delivery;
+                        if (delivery.deploy && delivery.deploy.kubernetes) {
+                            const k8s = delivery.deploy.kubernetes;
+                            mergedData.delivery = `Kubernetes (${k8s.type}) [${k8s.namespace}]`;
+                        } else if (delivery.promote) {
+                            mergedData.delivery = delivery.promote;
+                        }
+                    } else {
+                        mergedData.delivery = projectData.project.delivery;
+                    }
+                }
+
+                // Handle references (integration information)
+                if (projectData.project.references) {
+                    const refs = projectData.project.references;
+                    if (refs.jira) mergedData.issue_tracking = refs.jira;
+                    if (refs.servicenow) mergedData.change_management = refs.servicenow;
+                    if (refs.team_city) mergedData.team_city = refs.team_city;
+                }
+            }
+
+            updateReportData(mergedData);
+        })
+        .catch(error => {
+            console.error('Error loading report data:', error);
+        });
     });
 </script>
 

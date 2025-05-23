@@ -1,0 +1,46 @@
+{
+  "project": {
+    "id": "hello-world",
+    "name": "Hello World",
+    "description": "The hello world service",
+
+    "application": {
+      "id": "samples",
+      "name": "Samples",
+      "idip": "SAMPLES"
+    },
+
+    "team": {
+      "code": "dpe"
+    },
+
+    "languages": [
+      "Java",
+      "Dockerfile",
+      "Shell"
+    ],
+
+    "build_system": "gradle",
+
+    "delivery": {
+      "promote": "library",
+      "deploy": {
+        "kubernetes": {
+          "type": "helm",
+          "namespace": "hello-world"
+        }
+      }
+    },
+
+    "test": {
+      "command": "post-deploy-test.sh",
+      "image": "ubuntu:noble"
+    },
+
+    "references": {
+      "servicenow": "HLO",
+      "jira": "DPE",
+      "team_city": "Apps_DPE_HelloWorld"
+    }
+  }
+}
