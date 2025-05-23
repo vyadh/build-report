@@ -626,11 +626,11 @@
             updateElement('delivery', data.delivery);
 
             // Handle languages
-            if (data.languages) {
+            if (data.languages?.length) {
                 const langContainer = document.getElementById('languages');
                 if (langContainer) {
                     langContainer.innerHTML = '';
-                    data.languages.split(', ').forEach(lang => {
+                    data.languages.forEach(lang => {
                         const tagSpan = document.createElement('span');
                         tagSpan.className = 'tag';
                         tagSpan.textContent = lang;
@@ -692,9 +692,9 @@
                     };
                 }
 
-                // Convert languages array to string
+                // Keep languages as an array
                 if (project.languages?.length) {
-                    mergedData.languages = project.languages.join(', ');
+                    mergedData.languages = project.languages;
                 }
 
                 // Copy build system
