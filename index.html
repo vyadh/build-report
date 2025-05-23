@@ -691,17 +691,13 @@
 
             // Team information
             if (project?.team) {
-                updateElement('team-code', project.team.code,
-                    generateGitHubLink('team', build, project));
+                updateElement('team-code', project.team.code, generateGitHubLink('team', build, project));
                 updateElement('team-slug', project.team.slug);
             }
 
             // Organization and repository
-            updateElement('organisation', build?.owner,
-                generateGitHubLink('organisation', build, project));
-
-            updateElement('repository', build?.repository,
-                generateGitHubLink('repository', build, project));
+            updateElement('organisation', build?.owner, generateGitHubLink('organisation', build, project));
+            updateElement('repository', build?.repository, generateGitHubLink('repository', build, project));
 
             // Build information
             const buildRef = formatBuildReference(build?.run_id, build?.run_number, build?.run_attempt);
@@ -709,21 +705,17 @@
             const maturity = formatMaturity(build?.snapshot);
 
             if (build?.version) {
-                updateElement('version', build.version,
-                    generateGitHubLink('version', build, project));
+                updateElement('version', build.version, generateGitHubLink('version', build, project));
             } else {
                 const versionEl = document.getElementById('version');
                 if (versionEl) versionEl.parentElement.style.display = 'none';
             }
 
-            updateElement('build-reference', buildRef,
-                generateGitHubLink('build-reference', build, project));
-
+            updateElement('build-reference', buildRef, generateGitHubLink('build-reference', build, project));
             updateElement('branch', build?.ref_name);
 
             if (build?.revision) {
-                updateElement('revision', build.revision.substring(0, 7),
-                    generateGitHubLink('commit', build, project));
+                updateElement('revision', build.revision.substring(0, 7), generateGitHubLink('commit', build, project));
             }
 
             updateElement('actor', build?.actor);
@@ -742,6 +734,20 @@
             updateElement('build-system', project?.build_system);
 
             updateElement('project-maturity', maturity);
+
+            // Update the maturity badge with appropriate styling based on snapshot value
+            if (maturity) {
+                const maturityEl = document.getElementById('project-maturity');
+                if (maturityEl) {
+                    maturityEl.textContent = maturity;
+
+                    // If snapshot is false (Release), use the green success color like branch protection
+                    if (!build?.snapshot) {
+                        maturityEl.classList.remove('badge-secondary');
+                        maturityEl.classList.add('badge-success');
+                    }
+                }
+            }
 
             // Delivery information
             const deliverySection = document.getElementById('delivery-section');
