@@ -3,6 +3,7 @@
     "id": "hello-world",
     "name": "Hello World",
     "description": "The hello world service",
+    "type": "api",
 
     "application": {
       "id": "samples",
