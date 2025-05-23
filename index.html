@@ -752,6 +752,7 @@
                 }
 
                 // Build details
+                if (buildData.build.version) mergedData.version = buildData.build.version;
                 if (buildData.build.revision) mergedData.revision = buildData.build.revision;
                 if (buildData.build.actor) mergedData.actor = buildData.build.actor;
                 if (buildData.build.runner) mergedData.runner = buildData.build.runner;
