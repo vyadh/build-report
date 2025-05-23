@@ -461,28 +461,10 @@
         </div>
 
         <!-- Delivery -->
-        <div class="info-section">
+        <div class="info-section" id="delivery-section" style="display: none;">
             <h3 class="section-title">Delivery</h3>
-            <div class="info-list">
-                <div class="info-item">
-                    <div class="item-label">Type</div>
-                    <div class="item-value" id="delivery-type"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Destination</div>
-                    <div class="item-value" id="destination"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Namespace</div>
-                    <div class="item-value" id="namespace"></div>
-                </div>
-
-                <div class="info-item">
-                    <div class="item-label">Mechanism</div>
-                    <div class="item-value" id="mechanism"></div>
-                </div>
+            <div class="info-list" id="delivery-info-list">
+                <!-- Info items will be added dynamically -->
             </div>
         </div>
 
@@ -658,7 +640,28 @@
             }
         }
 
-        // Load and process data
+        // Function to add an info item to a container
+        function addInfoItem(container, id, label, value) {
+            if (value) {
+                const infoItem = document.createElement('div');
+                infoItem.className = 'info-item';
+
+                const itemLabel = document.createElement('div');
+                itemLabel.className = 'item-label';
+                itemLabel.textContent = label;
+
+                const itemValue = document.createElement('div');
+                itemValue.className = 'item-value';
+                itemValue.id = id;
+                itemValue.textContent = value;
+
+                infoItem.appendChild(itemLabel);
+                infoItem.appendChild(itemValue);
+                container.appendChild(infoItem);
+            }
+        }
+
+        // Dynamically add info-items based on conditions
         Promise.all([
             fetch('project.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load project.json')),
             fetch('build.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load build.json'))
@@ -741,14 +744,22 @@
             updateElement('project-maturity', maturity);
 
             // Delivery information
-            updateElement('delivery-type', "Deployment");
+            const deliverySection = document.getElementById('delivery-section');
+            const deliveryInfoList = document.getElementById('delivery-info-list');
 
-            // Update and show destination, namespace, and mechanism if present
-            updateInfoItem('destination', 'Kubernetes', project?.delivery?.deploy?.kubernetes);
-            updateInfoItem('namespace', project?.delivery?.deploy?.kubernetes?.namespace,
-                               project?.delivery?.deploy?.kubernetes?.namespace);
-            updateInfoItem('mechanism', project?.delivery?.deploy?.kubernetes?.type,
-                              project?.delivery?.deploy?.kubernetes?.type);
+            if (project?.delivery && deliveryInfoList) {
+                // Clear any existing items
+                deliveryInfoList.innerHTML = '';
+
+                addInfoItem(deliveryInfoList, 'delivery-type', 'Type', 'Deployment')
+                addInfoItem(deliveryInfoList, 'destination', 'Destination', project?.delivery?.deploy?.kubernetes ? "Kubernetes" : "")
+                addInfoItem(deliveryInfoList, 'namespace', 'Namespace', project?.delivery?.deploy?.kubernetes?.namespace)
+                addInfoItem(deliveryInfoList, 'mechanism', 'Mechanism', project?.delivery?.deploy?.kubernetes?.type)
+
+                if (project?.delivery) {
+                    deliverySection.style.display = '';
+                }
+            }
 
             // Handle languages
             if (project?.languages?.length) {
@@ -792,4 +803,3 @@
 
 </body>
 </html>
-
