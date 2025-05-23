@@ -690,11 +690,6 @@
             if (projectData.project) {
                 mergedData.project = projectData.project;
 
-                // Transform project type to uppercase for display
-                if (projectData.project.type) {
-                    mergedData.project.type = projectData.project.type.toUpperCase();
-                }
-
                 // Handle nested application data
                 if (projectData.project.application) {
                     mergedData.application = projectData.project.application;
