@@ -676,61 +676,100 @@
             fetch('build.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load build.json'))
         ])
         .then(([projectData, buildData]) => {
-            // Create merged data using spread operator for a cleaner approach
-            const mergedData = {
-                // Extract relevant project information
-                ...projectData.project,
-                // Include application from project
-                application: projectData.project?.application,
-                // Include team directly from project
-                team: projectData.project?.team,
-                // Keep languages as an array
-                languages: projectData.project?.languages,
+            // Create merged data using direct property assignments rather than spreading
+            const mergedData = {};
 
-                // Format delivery information
-                delivery: (() => {
-                    const delivery = projectData.project?.delivery;
+            // Project information
+            if (projectData.project) {
+                mergedData.id = projectData.project.id;
+                mergedData.name = projectData.project.name;
+                mergedData.description = projectData.project.description;
+                mergedData.type = projectData.project.type;
+                mergedData.build_system = projectData.project.build_system;
+
+                // Application
+                mergedData.application = projectData.project.application;
+
+                // Team
+                mergedData.team = projectData.project.team;
+
+                // Languages (keep as array)
+                mergedData.languages = projectData.project.languages;
+
+                // Process delivery information
+                const delivery = projectData.project.delivery;
+                if (delivery) {
                     if (typeof delivery === 'object') {
-                        if (delivery?.deploy?.kubernetes) {
+                        if (delivery.deploy && delivery.deploy.kubernetes) {
                             const k8s = delivery.deploy.kubernetes;
-                            return `Kubernetes (${k8s.type}) [${k8s.namespace}]`;
-                        } else if (delivery?.promote) {
-                            return delivery.promote;
+                            mergedData.delivery = `Kubernetes (${k8s.type}) [${k8s.namespace}]`;
+                        } else if (delivery.promote) {
+                            mergedData.delivery = delivery.promote;
                         }
+                    } else {
+                        mergedData.delivery = delivery;
                     }
-                    return delivery;
-                })(),
+                }
 
-                // Extract references as top-level properties
-                issue_tracking: projectData.project?.references?.jira,
-                change_management: projectData.project?.references?.servicenow,
-                team_city: projectData.project?.references?.team_city,
+                // Extract references
+                if (projectData.project.references) {
+                    mergedData.issue_tracking = projectData.project.references.jira;
+                    mergedData.change_management = projectData.project.references.servicenow;
+                    mergedData.team_city = projectData.project.references.team_city;
+                }
+            }
 
-                // Extract all build information
-                ...buildData.build,
-                // Map organization property to match expected name
-                organisation: buildData.build?.owner,
-                // Format build reference
-                build_reference: buildData.build?.run_id ?
-                    `${buildData.build.run_id}.${buildData.build.run_number}.${buildData.build.run_attempt}` : undefined,
-                // Extract workflow name from reference
-                workflow: buildData.build?.workflow_ref?.match(/\.github\/workflows\/([^@]+)/)?.[1],
-                // Format timestamp (kept as is for date formatting in updateReportData)
-                timestamp: buildData.build?.captured_at,
-                // Format maturity information
-                maturity: buildData.build?.snapshot !== undefined ?
-                    (buildData.build.snapshot ? "Snapshot" : "Release") : null,
-                // Format artifacts from assets
-                artifacts: buildData.build?.assets?.map(asset => {
-                    const { icon, label } = getArtifactIcon(asset.type);
-                    return {
-                        name: asset.name,
-                        type: label || asset.type,
-                        icon: icon,
-                        url: asset.url || '#'
-                    };
-                })
-            };
+            // Build information
+            if (buildData.build) {
+                mergedData.platform = buildData.build.platform;
+                mergedData.repository = buildData.build.repository;
+                mergedData.branch = buildData.build.ref_name;
+                mergedData.revision = buildData.build.revision;
+                mergedData.actor = buildData.build.actor;
+                mergedData.runner = buildData.build.runner;
+                mergedData.version = buildData.build.version;
+                mergedData.timestamp = buildData.build.captured_at;
+
+                // Map organization property
+                mergedData.organisation = buildData.build.owner;
+
+                // Format protected branch info
+                if (buildData.build.protected_branch !== undefined) {
+                    mergedData.protected_branch = buildData.build.protected_branch ? "Yes" : "No";
+                }
+
+                // Build run reference
+                if (buildData.build.run_id) {
+                    mergedData.build_reference =
+                        `${buildData.build.run_id}.${buildData.build.run_number}.${buildData.build.run_attempt}`;
+                }
+
+                // Extract workflow name
+                if (buildData.build.workflow_ref) {
+                    const match = buildData.build.workflow_ref.match(/\.github\/workflows\/([^@]+)/);
+                    if (match && match[1]) {
+                        mergedData.workflow = match[1];
+                    }
+                }
+
+                // Format maturity
+                if (buildData.build.snapshot !== undefined) {
+                    mergedData.maturity = buildData.build.snapshot ? "Snapshot" : "Release";
+                }
+
+                // Process artifacts
+                if (buildData.build.assets && buildData.build.assets.length > 0) {
+                    mergedData.artifacts = buildData.build.assets.map(asset => {
+                        const { icon, label } = getArtifactIcon(asset.type);
+                        return {
+                            name: asset.name,
+                            type: label || asset.type,
+                            icon: icon,
+                            url: asset.url || '#'
+                        };
+                    });
+                }
+            }
 
             updateReportData(mergedData);
         })
