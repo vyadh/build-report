@@ -184,34 +184,34 @@ const updateBadges = (build, project) => {
         updateBadge('production', 'Non-Production', 'badge-secondary');
     }
 
-    // Update pre-release badge
+    // Update release-maturity badge
     if (pre_release === true) {
-        updateBadge('pre-release', 'Pre-Release', 'badge-secondary');
+        updateBadge('release-maturity', 'Pre-Release', 'badge-secondary');
     } else if (pre_release === false) {
-        updateBadge('pre-release', 'Final', 'badge-success');
+        updateBadge('release-maturity', 'Final', 'badge-success');
     }
 
     // Show default branch badge if this is the default branch
     if (isDefaultBranch) {
-        updateBadge('default', 'Default', 'badge-subtle');
+        updateBadge('default-branch', 'Default', 'badge-subtle');
     }
 
-    // Update protection badge based on protection status and whether it's the default branch
+    // Update badge based on branch protection status and whether it's the default branch
     if (protected_branch === true) {
-        updateBadge('protection', 'Protected', 'badge-success');
+        updateBadge('protected-branch', 'Protected', 'badge-success');
     } else if (protected_branch === false) {
         if (isDefaultBranch) {
-            updateBadge('protection', 'Unprotected', production_process ? 'badge-danger' : 'badge-warning');
+            updateBadge('protected-branch', 'Unprotected', production_process ? 'badge-danger' : 'badge-warning');
         } else {
-            updateBadge('protection', 'Unprotected', 'badge-subtle');
+            updateBadge('protected-branch', 'Unprotected', 'badge-subtle');
         }
     }
 
     // Update maturity badge if snapshot info exists
     if (snapshot === true) {
-        updateBadge('project-maturity', 'Snapshot', pre_release === false ? 'badge-danger' : 'badge-secondary');
+        updateBadge('build-maturity', 'Snapshot', pre_release === false ? 'badge-danger' : 'badge-secondary');
     } else if (snapshot === false) {
-        updateBadge('project-maturity', 'Release', 'badge-success');
+        updateBadge('build-maturity', 'Release', 'badge-success');
     }
 };
 
