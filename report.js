@@ -139,13 +139,13 @@ const renderReport = (project, build) => {
     updateElement('change-management', references?.servicenow, generateServiceNowLink(references?.servicenow));
     updateElement('team-city', references?.team_city, generateTeamCityLink(references?.team_city));
 
-    // Artifacts
+    // Assets
     if (assets?.length > 0) {
-        const artifactsContainer = document.querySelector('.artifacts-list');
-        if (artifactsContainer) {
-            artifactsContainer.innerHTML = '';
-            assets.map(processArtifact).forEach(artifact => {
-                artifactsContainer.appendChild(createArtifactElement(artifact));
+        const assetsContainer = document.querySelector('.assets-list');
+        if (assetsContainer) {
+            assetsContainer.innerHTML = '';
+            assets.map(processAsset).forEach(asset => {
+                assetsContainer.appendChild(createAssetElement(asset));
             });
         }
     }
@@ -233,34 +233,42 @@ const addInfoItem = (container, id, label, value) => {
     container.appendChild(infoItem);
 };
 
-const createArtifactElement = ({ name, type, url, icon = 'file_present' }) => {
-    const artifactItem = document.createElement('a');
-    artifactItem.href = url ?? '#';
-    artifactItem.className = 'artifact-item';
-    artifactItem.target = '_blank';
+const createAssetElement = ({ name, type, url, icon = 'file_present' }) => {
+    const assetItem = document.createElement('a');
+    assetItem.href = url ?? '#';
+    assetItem.className = 'asset-item';
+    assetItem.target = '_blank';
 
-    artifactItem.innerHTML = `
-        <div class="artifact-icon"><span class="material-icons">${icon}</span></div>
-        <div class="artifact-info">
-            <div class="artifact-name">${name}</div>
-            <div class="artifact-type">${type}</div>
+    assetItem.innerHTML = `
+        <div class="asset-icon"><span class="material-icons">${icon}</span></div>
+        <div class="asset-info">
+            <div class="asset-name">${name}</div>
+            <div class="asset-type">${type}</div>
         </div>
     `;
 
-    return artifactItem;
+    return assetItem;
 };
 
-const processArtifact = asset => {
-    const { icon, label } = getArtifactIcon(asset.type);
+const processAsset = asset => {
+    const { icon, label } = getAssetIcon(asset.type);
+
+    // Extract just the filename from paths
+    const fullName = asset.name;
+    const displayName = fullName.includes('/') ?
+        fullName.substring(fullName.lastIndexOf('/') + 1) :
+        fullName;
+
     return {
-        name: asset.name,
+        name: displayName,
+        fullName: fullName, // Keep the original full name for reference
         type: label ?? asset.type,
         icon,
         url: asset.url ?? '#'
     };
 };
 
-const getArtifactIcon = (type) => {
+const getAssetIcon = (type) => {
     if (!type) return { icon: 'file_present', label: 'Unknown' };
 
     const lowerType = type.toLowerCase();

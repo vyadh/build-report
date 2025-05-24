@@ -217,26 +217,26 @@ a:hover {
     color: var(--info);
 }
 
-/* Artifacts section */
-.artifacts-container {
+/* Assets section */
+.assets-container {
     background-color: var(--bg-secondary);
     border-radius: var(--border-radius);
     padding: var(--spacing-lg);
     margin-top: var(--spacing-lg);
 }
 
-.artifacts-title {
+.assets-title {
     color: var(--accent-secondary);
     margin-bottom: var(--spacing-md);
 }
 
-.artifacts-list {
+.assets-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--spacing-md);
 }
 
-.artifact-item {
+.asset-item {
     background-color: var(--bg-tertiary);
     padding: var(--spacing-md);
     border-radius: var(--border-radius);
@@ -245,12 +245,12 @@ a:hover {
     transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-.artifact-item:hover {
+.asset-item:hover {
     transform: translateY(-2px);
     background-color: var(--bg-secondary);
 }
 
-.artifact-icon {
+.asset-icon {
     margin-right: var(--spacing-sm);
     width: 24px;
     height: 24px;
@@ -260,16 +260,16 @@ a:hover {
     color: var(--accent-secondary);
 }
 
-.artifact-info {
+.asset-info {
     flex-grow: 1;
 }
 
-.artifact-name {
+.asset-name {
     font-weight: 500;
     margin-bottom: 4px;
 }
 
-.artifact-type {
+.asset-type {
     color: var(--text-muted);
     font-size: 0.85rem;
 }
@@ -288,7 +288,7 @@ a:hover {
         grid-template-columns: 1fr;
     }
 
-    .artifacts-list {
+    .assets-list {
         grid-template-columns: 1fr;
     }
 
