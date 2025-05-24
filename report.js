@@ -240,7 +240,7 @@ const createAssetElement = ({ name, type, url, icon = 'file_present' }) => {
     assetItem.target = '_blank';
 
     assetItem.innerHTML = `
-        <div class="asset-icon"><span class="material-icons">${icon}</span></div>
+        <div class="asset-icon"><span class="material-symbols-rounded">${icon}</span></div>
         <div class="asset-info">
             <div class="asset-name">${name}</div>
             <div class="asset-type">${type}</div>
@@ -276,11 +276,11 @@ const getAssetIcon = (type, packageType) => {
 
     // Handle other asset types
     switch (lowerType) {
-        case 'container-image': return { icon: 'package', label: 'Container Image' };
+        case 'container-image': return { icon: 'deployed_code', label: 'Container Image' };
         case 'helm-chart': return { icon: 'anchor', label: 'Helm Chart' };
         case 'docs': return { icon: 'description', label: 'Documentation' };
         case 'source': return { icon: 'code', label: 'Source' };
-        case 'package': return { icon: 'inventory_2', label: 'Package' };
+        case 'package': return { icon: 'package_2', label: 'Package' };
         default: return { icon: 'file_present', label: type };
     }
 };
