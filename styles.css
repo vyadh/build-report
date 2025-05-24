@@ -123,6 +123,11 @@ body {
     color: var(--bg-primary);
 }
 
+.badge-danger {
+    background-color: var(--danger);
+    color: var(--bg-primary);
+}
+
 .badge-subtle {
     background-color: var(--bg-tertiary);
     color: var(--text-muted);

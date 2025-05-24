@@ -42,7 +42,7 @@ const renderReport = (project, build) => {
     updateElement('repository', build?.repository, generateGitHubLink('repository', build, project));
 
     // Build information
-    const { run_id, run_number, run_attempt, workflow_ref, version, ref_name, revision, actor, runner, protected_branch, snapshot, captured_at, assets } = build ?? {};
+    const { run_id, run_number, run_attempt, workflow_ref, version, ref_name, revision, actor, runner, protected_branch, snapshot, production_process, captured_at, assets } = build ?? {};
 
     const buildRef = formatBuildReference(run_id, run_number, run_attempt);
     const workflow = extractWorkflowName(workflow_ref);
@@ -75,6 +75,12 @@ const renderReport = (project, build) => {
 
     updateElement('build-system', project?.build_system);
 
+    if (production_process === true) {
+        updateBadge('production', 'Production', 'badge-subtle');
+    } else if (production_process === false) {
+        updateBadge('production', 'Non-Production', 'badge-secondary');
+    }
+
     // Show default branch badge if this is the default branch
     const isDefaultBranch = build?.ref_default === ref_name;
     if (isDefaultBranch) {
@@ -86,7 +92,7 @@ const renderReport = (project, build) => {
         updateBadge('protection', 'Protected', 'badge-success');
     } else if (protected_branch === false) {
         if (isDefaultBranch) {
-            updateBadge('protection', 'Unprotected', 'badge-warning');
+            updateBadge('protection', 'Unprotected', production_process ? 'badge-danger' : 'badge-warning');
         } else {
             updateBadge('protection', 'Unprotected', 'badge-subtle');
         }
