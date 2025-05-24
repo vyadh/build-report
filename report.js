@@ -103,9 +103,7 @@ const renderReport = (project, build) => {
         if (langContainer) {
             langContainer.replaceChildren()
             languages.forEach(lang => {
-                const tagSpan = document.createElement("span")
-                tagSpan.className = "tag"
-                tagSpan.textContent = lang
+                const tagSpan = createElement("span", "tag", lang)
                 langContainer.appendChild(tagSpan)
             })
         }
@@ -243,53 +241,27 @@ const updateInfoItem = (id, value, condition) => {
 const addInfoItem = (container, id, label, value) => {
     if (!value) return
 
-    const infoItem = document.createElement("div")
-    infoItem.className = "info-item"
+    const itemLabel = createElement("div", "item-label", label)
+    const itemValue = createElement("div", "item-value", value, { id })
+    const infoItem = createContainer("info-item", [itemLabel, itemValue])
 
-    const itemLabel = document.createElement("div")
-    itemLabel.className = "item-label"
-    itemLabel.textContent = label
-
-    const itemValue = document.createElement("div")
-    itemValue.className = "item-value"
-    itemValue.id = id
-    itemValue.textContent = value
-
-    infoItem.appendChild(itemLabel)
-    infoItem.appendChild(itemValue)
     container.appendChild(infoItem)
 }
 
 const createAssetElement = ({ name, type, url, icon = "file_present" }) => {
-    const assetItem = document.createElement("a")
-    assetItem.href = url ?? "#"
-    assetItem.className = "asset-item"
-    assetItem.target = "_blank"
+    // Create individual elements using helper functions
+    const iconSpan = createElement("span", "material-symbols-rounded", icon)
+    const iconDiv = createContainer("asset-icon", [iconSpan])
 
-    // Create icon element
-    const iconDiv = document.createElement("div")
-    iconDiv.className = "asset-icon"
+    const nameDiv = createElement("div", "asset-name", name)
+    const typeDiv = createElement("div", "asset-type", type)
+    const infoDiv = createContainer("asset-info", [nameDiv, typeDiv])
 
-    const iconSpan = document.createElement("span")
-    iconSpan.className = "material-symbols-rounded"
-    iconSpan.textContent = icon
-    iconDiv.appendChild(iconSpan)
-
-    // Create info container
-    const infoDiv = document.createElement("div")
-    infoDiv.className = "asset-info"
-
-    // Create and add name element
-    const nameDiv = document.createElement("div")
-    nameDiv.className = "asset-name"
-    nameDiv.textContent = name
-    infoDiv.appendChild(nameDiv)
-
-    // Create and add type element
-    const typeDiv = document.createElement("div")
-    typeDiv.className = "asset-type"
-    typeDiv.textContent = type
-    infoDiv.appendChild(typeDiv)
+    // Create the asset item link element with attributes
+    const assetItem = createElement("a", "asset-item", null, {
+        href: url ?? "#",
+        target: "_blank"
+    })
 
     // Append all elements to the asset item
     assetItem.appendChild(iconDiv)
@@ -342,3 +314,23 @@ const extractWorkflowName = workflowRef => {
 const formatBuildReference = (runId, runNumber, runAttempt) =>
     runId ? `${runId}.${runNumber}.${runAttempt}` : null
 
+// DOM helper functions
+const createElement = (type, className, textContent, attributes = {}) => {
+    const element = document.createElement(type)
+    element.className = className
+    element.textContent = textContent
+
+    // Apply any additional attributes
+    Object.entries(attributes).forEach(([key, value]) => {
+        element[key] = value
+    })
+
+    return element
+}
+
+const createContainer = (className, children = []) => {
+    const container = document.createElement("div")
+    container.className = className
+    children.forEach(child => container.appendChild(child))
+    return container
+}
