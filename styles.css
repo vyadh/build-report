@@ -274,16 +274,6 @@ a:hover {
     font-size: 0.85rem;
 }
 
-/* Footer */
-.report-footer {
-    padding: var(--spacing-md) var(--spacing-lg);
-    background-color: var(--bg-secondary);
-    border-top: 1px solid var(--border-color);
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    text-align: center;
-}
-
 /* Responsive media queries */
 @media (max-width: 768px) {
     .build-report {
