@@ -1,144 +1,18 @@
-// Helper function to update element text and optionally set href
-const updateElement = (id, value, hrefTemplate = null) => {
-    if (!value) return;
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    el.textContent = value;
-    if (hrefTemplate) el.href = hrefTemplate;
-};
-
-// Helper function to create artifact element
-const createArtifactElement = ({ name, type, url, icon = 'file_present' }) => {
-    const artifactItem = document.createElement('a');
-    artifactItem.href = url ?? '#';
-    artifactItem.className = 'artifact-item';
-    artifactItem.target = '_blank';
-
-    artifactItem.innerHTML = `
-        <div class="artifact-icon"><span class="material-icons">${icon}</span></div>
-        <div class="artifact-info">
-            <div class="artifact-name">${name}</div>
-            <div class="artifact-type">${type}</div>
-        </div>
-    `;
-
-    return artifactItem;
-};
-
-// Get icon for artifact based on type
-const getArtifactIcon = (type) => {
-    if (!type) return { icon: 'file_present', label: 'Unknown' };
-
-    const lowerType = type.toLowerCase();
-
-    switch (lowerType) {
-        case 'container-image': return { icon: 'image', label: 'Container Image' };
-        case 'helm-chart': return { icon: 'insert_chart', label: 'Helm Chart' };
-        case 'jar': return { icon: 'code', label: 'JAR' };
-        case 'documentation': return { icon: 'description', label: 'Documentation' };
-        case 'source': return { icon: 'source', label: 'Source' };
-        default: return { icon: 'file_present', label: type };
-    }
-};
-
-const generateGitHubLink = (type, build, project) => {
-    const { owner, repository, version, run_id, run_number, run_attempt, revision, workflow_ref } = build ?? {};
-
-    switch (type) {
-        case 'organisation':
-            return owner ? `https://github.com/${owner}` : null;
-        case 'repository':
-            return owner && repository ? `https://github.com/${owner}/${repository}` : null;
-        case 'version':
-            return owner && repository && version ?
-                `https://github.com/${owner}/${repository}/releases/tag/v${version}` : null;
-        case 'build-reference':
-            const buildRef = formatBuildReference(run_id, run_number, run_attempt);
-            return owner && repository && buildRef ?
-                `https://github.com/${owner}/${repository}/actions/runs/${buildRef.split('.')[0]}` : null;
-        case 'commit':
-            return owner && repository && revision ?
-                `https://github.com/${owner}/${repository}/commit/${revision}` : null;
-        case 'workflow':
-            const workflow = extractWorkflowName(workflow_ref);
-            return owner && repository && workflow ?
-                `https://github.com/${owner}/${repository}/blob/main/.github/workflows/${workflow}` : null;
-        case 'team':
-            return owner && project?.team?.slug ?
-                `https://github.com/orgs/${owner}/teams/${project.team.slug}` : null;
-        default:
-            return null;
-    }
-};
-
-const generateJiraLink = data => data ? `https://jira.example.com/projects/${data}` : null;
-const generateServiceNowLink = data => data ? `https://servicenow.example.com/item/${data}` : null;
-const generateTeamCityLink = data => data ? `https://teamcity.example.com/project/${data}` : null;
-
-// Extract workflow name from workflow reference
-const extractWorkflowName = workflowRef => {
-    if (!workflowRef) return null;
-    const match = workflowRef.match(/\.github\/workflows\/([^@]+)/);
-    return match?.[1] ?? null;
-};
-
-// Format build reference from run information
-const formatBuildReference = (runId, runNumber, runAttempt) =>
-    runId ? `${runId}.${runNumber}.${runAttempt}` : null;
-
-// Process asset to artifact with proper icon
-const processArtifact = asset => {
-    const { icon, label } = getArtifactIcon(asset.type);
-    return {
-        name: asset.name,
-        type: label ?? asset.type,
-        icon,
-        url: asset.url ?? '#'
-    };
-};
-
-// Function to handle info items - updates value and shows/hides based on existence
-const updateInfoItem = (id, value, condition) => {
-    const item = document.getElementById(id)?.closest('.info-item');
-    if (condition) {
-        updateElement(id, value);
-        if (item) item.style.display = '';
-    } else {
-        if (item) item.style.display = 'none';
-    }
-};
-
-// Function to add an info item to a container
-const addInfoItem = (container, id, label, value) => {
-    if (!value) return;
-
-    const infoItem = document.createElement('div');
-    infoItem.className = 'info-item';
-
-    const itemLabel = document.createElement('div');
-    itemLabel.className = 'item-label';
-    itemLabel.textContent = label;
-
-    const itemValue = document.createElement('div');
-    itemValue.className = 'item-value';
-    itemValue.id = id;
-    itemValue.textContent = value;
-
-    infoItem.appendChild(itemLabel);
-    infoItem.appendChild(itemValue);
-    container.appendChild(infoItem);
-};
-
-// Helper function to handle badge display and styling
-const updateBadge = (id, isActive, activeText, activeClass, inactiveText, inactiveClass) => {
-    const badge = document.getElementById(id);
-    if (!badge) return;
-
-    badge.style.display = '';
-    badge.textContent = isActive ? activeText : inactiveText;
-    badge.classList.add(isActive ? activeClass : inactiveClass);
-};
+// Initialize the application when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Dynamically add info-items based on conditions
+    Promise.all([
+        fetch('project.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load project.json')),
+        fetch('build.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load build.json'))
+    ])
+    .then(([projectData, buildData]) => {
+        // Keep data sources separate and render the report
+        renderReport(projectData.project, buildData.build);
+    })
+    .catch(error => {
+        console.error('Error loading report data:', error);
+    });
+});
 
 // Function to render the report using the separate data sources
 const renderReport = (project, build) => {
@@ -277,18 +151,135 @@ const renderReport = (project, build) => {
     }
 };
 
-// Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Dynamically add info-items based on conditions
-    Promise.all([
-        fetch('project.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load project.json')),
-        fetch('build.json').then(response => response.ok ? response.json() : Promise.reject('Failed to load build.json'))
-    ])
-    .then(([projectData, buildData]) => {
-        // Keep data sources separate and render the report
-        renderReport(projectData.project, buildData.build);
-    })
-    .catch(error => {
-        console.error('Error loading report data:', error);
-    });
-});
+const generateGitHubLink = (type, build, project) => {
+    const { owner, repository, version, run_id, run_number, run_attempt, revision, workflow_ref } = build ?? {};
+
+    switch (type) {
+        case 'organisation':
+            return owner ? `https://github.com/${owner}` : null;
+        case 'repository':
+            return owner && repository ? `https://github.com/${owner}/${repository}` : null;
+        case 'version':
+            return owner && repository && version ?
+                `https://github.com/${owner}/${repository}/releases/tag/v${version}` : null;
+        case 'build-reference':
+            const buildRef = formatBuildReference(run_id, run_number, run_attempt);
+            return owner && repository && buildRef ?
+                `https://github.com/${owner}/${repository}/actions/runs/${buildRef.split('.')[0]}` : null;
+        case 'commit':
+            return owner && repository && revision ?
+                `https://github.com/${owner}/${repository}/commit/${revision}` : null;
+        case 'workflow':
+            const workflow = extractWorkflowName(workflow_ref);
+            return owner && repository && workflow ?
+                `https://github.com/${owner}/${repository}/blob/main/.github/workflows/${workflow}` : null;
+        case 'team':
+            return owner && project?.team?.slug ?
+                `https://github.com/orgs/${owner}/teams/${project.team.slug}` : null;
+        default:
+            return null;
+    }
+};
+
+const generateJiraLink = data => data ? `https://jira.example.com/projects/${data}` : null;
+const generateServiceNowLink = data => data ? `https://servicenow.example.com/item/${data}` : null;
+const generateTeamCityLink = data => data ? `https://teamcity.example.com/project/${data}` : null;
+
+const updateElement = (id, value, hrefTemplate = null) => {
+    if (!value) return;
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.textContent = value;
+    if (hrefTemplate) el.href = hrefTemplate;
+};
+
+const updateBadge = (id, isActive, activeText, activeClass, inactiveText, inactiveClass) => {
+    const badge = document.getElementById(id);
+    if (!badge) return;
+
+    badge.style.display = '';
+    badge.textContent = isActive ? activeText : inactiveText;
+    badge.classList.add(isActive ? activeClass : inactiveClass);
+};
+
+const updateInfoItem = (id, value, condition) => {
+    const item = document.getElementById(id)?.closest('.info-item');
+    if (condition) {
+        updateElement(id, value);
+        if (item) item.style.display = '';
+    } else {
+        if (item) item.style.display = 'none';
+    }
+};
+
+const addInfoItem = (container, id, label, value) => {
+    if (!value) return;
+
+    const infoItem = document.createElement('div');
+    infoItem.className = 'info-item';
+
+    const itemLabel = document.createElement('div');
+    itemLabel.className = 'item-label';
+    itemLabel.textContent = label;
+
+    const itemValue = document.createElement('div');
+    itemValue.className = 'item-value';
+    itemValue.id = id;
+    itemValue.textContent = value;
+
+    infoItem.appendChild(itemLabel);
+    infoItem.appendChild(itemValue);
+    container.appendChild(infoItem);
+};
+
+const createArtifactElement = ({ name, type, url, icon = 'file_present' }) => {
+    const artifactItem = document.createElement('a');
+    artifactItem.href = url ?? '#';
+    artifactItem.className = 'artifact-item';
+    artifactItem.target = '_blank';
+
+    artifactItem.innerHTML = `
+        <div class="artifact-icon"><span class="material-icons">${icon}</span></div>
+        <div class="artifact-info">
+            <div class="artifact-name">${name}</div>
+            <div class="artifact-type">${type}</div>
+        </div>
+    `;
+
+    return artifactItem;
+};
+
+const processArtifact = asset => {
+    const { icon, label } = getArtifactIcon(asset.type);
+    return {
+        name: asset.name,
+        type: label ?? asset.type,
+        icon,
+        url: asset.url ?? '#'
+    };
+};
+
+const getArtifactIcon = (type) => {
+    if (!type) return { icon: 'file_present', label: 'Unknown' };
+
+    const lowerType = type.toLowerCase();
+
+    switch (lowerType) {
+        case 'container-image': return { icon: 'image', label: 'Container Image' };
+        case 'helm-chart': return { icon: 'insert_chart', label: 'Helm Chart' };
+        case 'jar': return { icon: 'code', label: 'JAR' };
+        case 'documentation': return { icon: 'description', label: 'Documentation' };
+        case 'source': return { icon: 'source', label: 'Source' };
+        default: return { icon: 'file_present', label: type };
+    }
+};
+
+const extractWorkflowName = workflowRef => {
+    if (!workflowRef) return null;
+    const match = workflowRef.match(/\.github\/workflows\/([^@]+)/);
+    return match?.[1] ?? null;
+};
+
+const formatBuildReference = (runId, runNumber, runAttempt) =>
+    runId ? `${runId}.${runNumber}.${runAttempt}` : null;
