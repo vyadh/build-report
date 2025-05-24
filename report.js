@@ -44,43 +44,29 @@ const renderReport = (project, build) => {
     // Build information
     const { run_id, run_number, run_attempt, workflow_ref, version, ref_name, revision, actor, runner, captured_at, assets } = build ?? {}
 
-    const buildRef = formatBuildReference(run_id, run_number, run_attempt)
-    const workflow = extractWorkflowName(workflow_ref)
+    updateElement("branch", ref_name)
+    updateElement("actor", actor)
+    updateElement("runner", runner)
+    updateElement("build-reference", formatBuildReference(run_id, run_number, run_attempt), generateGitHubLink("build-reference", build, project))
+    updateElement("timestamp", new Date(captured_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "long" }))
+    updateElement("build-system", project?.build_system)
 
     if (version) {
         updateElement("version", version, generateGitHubLink("version", build, project))
-    } else {
-        const versionEl = document.getElementById("version")
-        if (versionEl) versionEl.parentElement.style.display = ""
     }
-
-    updateElement("build-reference", buildRef, generateGitHubLink("build-reference", build, project))
-    updateElement("branch", ref_name)
-
     if (revision) {
         updateElement("revision", revision.substring(0, 7), generateGitHubLink("commit", build, project))
     }
 
-    updateElement("actor", actor)
-    updateElement("runner", runner)
-
+    const workflow = extractWorkflowName(workflow_ref)
     if (workflow) {
         updateElement("workflow", workflow, generateGitHubLink("workflow", build, project))
     }
 
-    if (captured_at) {
-        const date = new Date(captured_at)
-        updateElement("timestamp", date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "long" }))
-    }
-
-    updateElement("build-system", project?.build_system)
-
     updateBadges(build, project)
 
     // Delivery information
-    const deliverySection = document.getElementById("delivery-section")
     const deliveryInfoList = document.getElementById("delivery-info-list")
-
     if (project?.delivery && deliveryInfoList) {
         // Clear any existing items
         deliveryInfoList.replaceChildren()
@@ -93,7 +79,7 @@ const renderReport = (project, build) => {
         addInfoItem(deliveryInfoList, "namespace", "Namespace", kubernetes?.namespace)
         addInfoItem(deliveryInfoList, "mechanism", "Mechanism", kubernetes?.type)
 
-        deliverySection.style.display = ""
+        document.getElementById("delivery-section").style.display = ""
     }
 
     // Handle languages
@@ -103,8 +89,7 @@ const renderReport = (project, build) => {
         if (langContainer) {
             langContainer.replaceChildren()
             languages.forEach(lang => {
-                const tagSpan = createElement("span", "tag", lang)
-                langContainer.appendChild(tagSpan)
+                langContainer.appendChild(createElement("span", "tag", lang))
             })
         }
     }
@@ -172,7 +157,7 @@ const updateElement = (id, value, hrefTemplate = null) => {
 
 // Function to handle all badge updates based on build state
 const updateBadges = (build, project) => {
-    const { protected_branch, snapshot, production_process, pre_release, ref_name, ref_default } = build ?? {}
+    const { protected_branch, snapshot, production_process, pre_release, version, ref_name, ref_default } = build ?? {}
     const isDefaultBranch = ref_default === ref_name
 
     // Update production process badge
@@ -180,6 +165,10 @@ const updateBadges = (build, project) => {
         updateBadge("production", "Production", "badge-subtle")
     } else if (production_process === false) {
         updateBadge("production", "Non-Production", "badge-secondary")
+    }
+
+    if (!version) {
+        updateBadge("version-missing", "None", "badge-subtle")
     }
 
     // Update release-maturity badge
