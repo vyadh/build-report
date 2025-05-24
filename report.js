@@ -251,7 +251,7 @@ const createAssetElement = ({ name, type, url, icon = 'file_present' }) => {
 };
 
 const getAsset = asset => {
-    const { icon, label } = getAssetIcon(asset.type);
+    const { icon, label } = getAssetIcon(asset.type, asset.packageType);
 
     // Extract just the filename from paths
     const fullName = asset.name;
@@ -268,17 +268,29 @@ const getAsset = asset => {
     };
 };
 
-const getAssetIcon = (type) => {
+const getAssetIcon = (type, packageType) => {
     if (!type) return { icon: 'file_present', label: 'Unknown' };
 
     const lowerType = type.toLowerCase();
 
+    // Handle package types with specific icons
+    if (lowerType === 'package' && packageType) {
+        const lowerPackageType = packageType.toLowerCase();
+        switch (lowerPackageType) {
+            case 'jar': return { icon: 'coffee', label: 'Java Package' };
+            case 'wheel': return { icon: 'cable', label: 'Python Wheel' };
+            case 'nuget': return { icon: 'package', label: 'NuGet Package' };
+            case 'npm': return { icon: 'library_books', label: 'NPM Package' };
+            default: return { icon: 'inventory', label: `${packageType} Package` };
+        }
+    }
+
+    // Handle other asset types
     switch (lowerType) {
-        case 'container-image': return { icon: 'inventory_2', label: 'Container Image' }; // Shipping container icon
-        case 'helm-chart': return { icon: 'sailing', label: 'Helm Chart' }; // Nautical/sailing icon
-        case 'jar': return { icon: 'coffee', label: 'JAR' }; // Coffee cup icon
+        case 'container-image': return { icon: 'inventory_2', label: 'Container Image' };
+        case 'helm-chart': return { icon: 'sailing', label: 'Helm Chart' };
         case 'docs': return { icon: 'description', label: 'Documentation' };
-        case 'source': return { icon: 'code', label: 'Source' }; // Code icon
+        case 'source': return { icon: 'code', label: 'Source' };
         default: return { icon: 'file_present', label: type };
     }
 };
