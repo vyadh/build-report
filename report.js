@@ -144,7 +144,7 @@ const renderReport = (project, build) => {
         const assetsContainer = document.querySelector('.assets-list');
         if (assetsContainer) {
             assetsContainer.innerHTML = '';
-            assets.map(processAsset).forEach(asset => {
+            assets.map(getAsset).forEach(asset => {
                 assetsContainer.appendChild(createAssetElement(asset));
             });
         }
@@ -250,7 +250,7 @@ const createAssetElement = ({ name, type, url, icon = 'file_present' }) => {
     return assetItem;
 };
 
-const processAsset = asset => {
+const getAsset = asset => {
     const { icon, label } = getAssetIcon(asset.type);
 
     // Extract just the filename from paths
@@ -274,11 +274,11 @@ const getAssetIcon = (type) => {
     const lowerType = type.toLowerCase();
 
     switch (lowerType) {
-        case 'container-image': return { icon: 'image', label: 'Container Image' };
-        case 'helm-chart': return { icon: 'insert_chart', label: 'Helm Chart' };
-        case 'jar': return { icon: 'code', label: 'JAR' };
-        case 'documentation': return { icon: 'description', label: 'Documentation' };
-        case 'source': return { icon: 'source', label: 'Source' };
+        case 'container-image': return { icon: 'inventory_2', label: 'Container Image' }; // Shipping container icon
+        case 'helm-chart': return { icon: 'sailing', label: 'Helm Chart' }; // Nautical/sailing icon
+        case 'jar': return { icon: 'coffee', label: 'JAR' }; // Coffee cup icon
+        case 'docs': return { icon: 'description', label: 'Documentation' };
+        case 'source': return { icon: 'code', label: 'Source' }; // Code icon
         default: return { icon: 'file_present', label: type };
     }
 };

@@ -28,8 +28,15 @@
       },
       {
         "name": "hello-world-1.2.3.tgz",
-        "type": "helm-chart",
-        "icon": "insert_chart"
+        "type": "helm-chart"
+      },
+      {
+        "name": "hello-world.sh",
+        "type": "source"
+      },
+      {
+        "name": "hello-world.md",
+        "type": "docs"
       }
     ]
   }
