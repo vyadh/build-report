@@ -87,6 +87,13 @@ const renderReport = (project, build) => {
         );
     }
 
+    // Show default branch badge if this is the default branch
+    if (build?.ref_default === ref_name) {
+        const defaultBadge = document.getElementById('default');
+        defaultBadge.style.display = '';
+        defaultBadge.className = 'badge badge-subtle';
+    }
+
     // Update maturity badge if snapshot info exists
     if (snapshot !== undefined) {
         updateBadge(
@@ -99,16 +106,11 @@ const renderReport = (project, build) => {
         );
     }
 
-    // Add default branch badge if this is the default branch
+    // Show default branch badge if this is the default branch
     if (build?.ref_default === ref_name) {
-        const defaultBadgeContainer = document.createElement('span');
-        defaultBadgeContainer.className = 'badge badge-subtle';
-        defaultBadgeContainer.textContent = 'Default';
-        defaultBadgeContainer.style.marginLeft = 'var(--spacing-xs)';
-
-        // Find the branch container and add the badge after the protection badge
-        const branchContainer = document.getElementById('branch').parentElement;
-        branchContainer.appendChild(defaultBadgeContainer);
+        const defaultBadge = document.getElementById('default');
+        defaultBadge.style.display = '';
+        defaultBadge.className = 'badge badge-subtle';
     }
 
     // Delivery information
