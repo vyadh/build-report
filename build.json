@@ -24,8 +24,7 @@
       },
       {
         "name": "libs/dpe/sample-app.jar",
-        "type": "package",
-        "packageType": "jar"
+        "type": "package"
       },
       {
         "name": "hello-world-1.2.3.tgz",
@@ -41,18 +40,15 @@
       },
       {
         "name": "hello_world-0.1.2-py3-none-any.whl",
-        "type": "package",
-        "packageType": "wheel"
+        "type": "package"
       },
       {
         "name": "HelloWorld.1.0.0.nupkg",
-        "type": "package",
-        "packageType": "nuget"
+        "type": "package"
       },
       {
         "name": "hello-world-1.0.0.tgz",
-        "type": "package",
-        "packageType": "npm"
+        "type": "package"
       }
     ]
   }
