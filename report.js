@@ -306,24 +306,13 @@ const getAssetIcon = (type, packageType) => {
 
     const lowerType = type.toLowerCase();
 
-    // Handle package types with specific icons
-    if (lowerType === 'package' && packageType) {
-        const lowerPackageType = packageType.toLowerCase();
-        switch (lowerPackageType) {
-            case 'jar': return { icon: 'coffee', label: 'Java Package' };
-            case 'wheel': return { icon: 'cable', label: 'Python Wheel' };
-            case 'nuget': return { icon: 'package', label: 'NuGet Package' };
-            case 'npm': return { icon: 'library_books', label: 'NPM Package' };
-            default: return { icon: 'inventory', label: `${packageType} Package` };
-        }
-    }
-
     // Handle other asset types
     switch (lowerType) {
         case 'container-image': return { icon: 'inventory_2', label: 'Container Image' };
         case 'helm-chart': return { icon: 'sailing', label: 'Helm Chart' };
         case 'docs': return { icon: 'description', label: 'Documentation' };
         case 'source': return { icon: 'code', label: 'Source' };
+        case 'package': return { icon: 'package', label: 'Package' };
         default: return { icon: 'file_present', label: type };
     }
 };
