@@ -257,11 +257,8 @@ const getAsset = asset => {
         fullName.substring(fullName.lastIndexOf('/') + 1) :
         fullName;
 
-    // Infer package type from filename or asset type
-    const inferredPackageType = inferPackageType(asset, displayName);
-
-    // Get icon and label based on inferred package type
-    const { icon, label } = getAssetIcon(asset.type, inferredPackageType);
+    // Get icon and label based on asset type
+    const { icon, label } = getAssetIcon(asset.type);
 
     return {
         name: displayName,
@@ -272,35 +269,6 @@ const getAsset = asset => {
     };
 };
 
-// Function to infer package type from filename, type, or build system
-const inferPackageType = (asset, filename) => {
-    // If it's not a package type, no need to infer
-    if (asset.type !== 'package') {
-        return null;
-    }
-
-    // Extract extension from filename
-    const extension = filename.includes('.') ?
-        filename.substring(filename.lastIndexOf('.') + 1).toLowerCase() : '';
-
-    // Check filename extensions to infer package type
-    if (filename.endsWith('.jar')) {
-        return 'jar';
-    } else if (filename.endsWith('.whl')) {
-        return 'wheel';
-    } else if (filename.endsWith('.nupkg')) {
-        return 'nuget';
-    } else if (filename.endsWith('.tgz') || filename.endsWith('.tar.gz') || filename.endsWith('.npm')) {
-        // This could be either npm or helm, but since helm has its own type,
-        // we can assume this is npm
-        return 'npm';
-    }
-
-    // If we couldn't infer from the extension, try to use project's build system
-    // This would require passing the project info to this function
-    return 'unknown';
-};
-
 const getAssetIcon = (type, packageType) => {
     if (!type) return { icon: 'file_present', label: 'Unknown' };
 
@@ -308,11 +276,11 @@ const getAssetIcon = (type, packageType) => {
 
     // Handle other asset types
     switch (lowerType) {
-        case 'container-image': return { icon: 'inventory_2', label: 'Container Image' };
-        case 'helm-chart': return { icon: 'sailing', label: 'Helm Chart' };
+        case 'container-image': return { icon: 'package', label: 'Container Image' };
+        case 'helm-chart': return { icon: 'anchor', label: 'Helm Chart' };
         case 'docs': return { icon: 'description', label: 'Documentation' };
         case 'source': return { icon: 'code', label: 'Source' };
-        case 'package': return { icon: 'package', label: 'Package' };
+        case 'package': return { icon: 'inventory_2', label: 'Package' };
         default: return { icon: 'file_present', label: type };
     }
 };
