@@ -42,7 +42,7 @@ const renderReport = (project, build) => {
     updateElement('repository', build?.repository, generateGitHubLink('repository', build, project));
 
     // Build information
-    const { run_id, run_number, run_attempt, workflow_ref, version, ref_name, revision, actor, runner, protected_branch, snapshot, production_process, pre_release, captured_at, assets } = build ?? {};
+    const { run_id, run_number, run_attempt, workflow_ref, version, ref_name, revision, actor, runner, captured_at, assets } = build ?? {};
 
     const buildRef = formatBuildReference(run_id, run_number, run_attempt);
     const workflow = extractWorkflowName(workflow_ref);
@@ -75,41 +75,7 @@ const renderReport = (project, build) => {
 
     updateElement('build-system', project?.build_system);
 
-    if (production_process === true) {
-        updateBadge('production', 'Production', 'badge-subtle');
-    } else if (production_process === false) {
-        updateBadge('production', 'Non-Production', 'badge-secondary');
-    }
-
-    if (pre_release === true) {
-        updateBadge('pre-release', 'Pre-Release', 'badge-secondary');
-    } else if (pre_release === false) {
-        updateBadge('pre-release', 'Final', 'badge-success');
-    }
-
-    // Show default branch badge if this is the default branch
-    const isDefaultBranch = build?.ref_default === ref_name;
-    if (isDefaultBranch) {
-        updateBadge('default', 'Default', 'badge-subtle');
-    }
-
-    // Update protection badge based on protection status and whether it's the default branch
-    if (protected_branch === true) {
-        updateBadge('protection', 'Protected', 'badge-success');
-    } else if (protected_branch === false) {
-        if (isDefaultBranch) {
-            updateBadge('protection', 'Unprotected', production_process ? 'badge-danger' : 'badge-warning');
-        } else {
-            updateBadge('protection', 'Unprotected', 'badge-subtle');
-        }
-    }
-
-    // Update maturity badge if snapshot info exists
-    if (snapshot === true) {
-        updateBadge( 'project-maturity', 'Snapshot', pre_release === false ? 'badge-danger' : 'badge-secondary');
-    } else if (snapshot === false) {
-        updateBadge( 'project-maturity', 'Release', 'badge-success');
-    }
+    updateBadges(build, project);
 
     // Delivery information
     const deliverySection = document.getElementById('delivery-section');
@@ -204,6 +170,49 @@ const updateElement = (id, value, hrefTemplate = null) => {
 
     el.textContent = value;
     if (hrefTemplate) el.href = hrefTemplate;
+};
+
+// Function to handle all badge updates based on build state
+const updateBadges = (build, project) => {
+    const { protected_branch, snapshot, production_process, pre_release, ref_name, ref_default } = build ?? {};
+    const isDefaultBranch = ref_default === ref_name;
+
+    // Update production process badge
+    if (production_process === true) {
+        updateBadge('production', 'Production', 'badge-subtle');
+    } else if (production_process === false) {
+        updateBadge('production', 'Non-Production', 'badge-secondary');
+    }
+
+    // Update pre-release badge
+    if (pre_release === true) {
+        updateBadge('pre-release', 'Pre-Release', 'badge-secondary');
+    } else if (pre_release === false) {
+        updateBadge('pre-release', 'Final', 'badge-success');
+    }
+
+    // Show default branch badge if this is the default branch
+    if (isDefaultBranch) {
+        updateBadge('default', 'Default', 'badge-subtle');
+    }
+
+    // Update protection badge based on protection status and whether it's the default branch
+    if (protected_branch === true) {
+        updateBadge('protection', 'Protected', 'badge-success');
+    } else if (protected_branch === false) {
+        if (isDefaultBranch) {
+            updateBadge('protection', 'Unprotected', production_process ? 'badge-danger' : 'badge-warning');
+        } else {
+            updateBadge('protection', 'Unprotected', 'badge-subtle');
+        }
+    }
+
+    // Update maturity badge if snapshot info exists
+    if (snapshot === true) {
+        updateBadge('project-maturity', 'Snapshot', pre_release === false ? 'badge-danger' : 'badge-secondary');
+    } else if (snapshot === false) {
+        updateBadge('project-maturity', 'Release', 'badge-success');
+    }
 };
 
 const updateBadge = (id, text, styleClass) => {
