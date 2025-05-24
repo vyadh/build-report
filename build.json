@@ -15,7 +15,7 @@
     "run_number": 3,
     "run_attempt": 1,
     "protected_branch": false,
-    "snapshot": false,
+    "snapshot": true,
     "runner": "myorg-runner-2",
     "captured_at": "2025-05-22T05:14:32Z",
     "assets": [
