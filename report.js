@@ -66,22 +66,24 @@ const populateProject = (project, build) => {
 }
 
 const populateDelivery = (project, build) => {
-    if (project.delivery) {
-        const deliveryInfoList = document.getElementById("delivery-info-list")
-
-        // Clear any existing items
-        deliveryInfoList.replaceChildren()
-
-        const { deploy } = project.delivery ?? {}
-        const { kubernetes } = deploy ?? {}
-
-        addInfoItem(deliveryInfoList, "delivery-type", "Type", "Deployment")
-        addInfoItem(deliveryInfoList, "destination", "Destination", kubernetes ? "Kubernetes" : "")
-        addInfoItem(deliveryInfoList, "namespace", "Namespace", kubernetes?.namespace)
-        addInfoItem(deliveryInfoList, "mechanism", "Mechanism", kubernetes?.type)
-
-        document.getElementById("delivery-section").style.display = ""
+    if (!project.delivery) {
+        return
     }
+
+    const deliveryInfoList = document.getElementById("delivery-info-list")
+
+    // Clear any existing items
+    deliveryInfoList.replaceChildren()
+
+    const { deploy } = project.delivery ?? {}
+    const { kubernetes } = deploy ?? {}
+
+    addInfoItem(deliveryInfoList, "delivery-type", "Type", "Deployment")
+    addInfoItem(deliveryInfoList, "destination", "Destination", kubernetes ? "Kubernetes" : "")
+    addInfoItem(deliveryInfoList, "namespace", "Namespace", kubernetes?.namespace)
+    addInfoItem(deliveryInfoList, "mechanism", "Mechanism", kubernetes?.type)
+
+    document.getElementById("delivery-section").style.display = ""
 }
 
 const populateIntegration = (project, build) => {
@@ -131,7 +133,7 @@ const updateBadges = (build, project) => {
     if (production_process === true) {
         updateBadge("production", "Production", "badge-subtle")
     } else if (production_process === false) {
-        updateBadge("production", "Non-Production", "badge-secondary")
+        updateBadge("production", "Non-Production", "badge-subtle")
     }
 
     if (!version) {
