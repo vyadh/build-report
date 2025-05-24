@@ -1,0 +1,27 @@
+name: Upload Report Artifact
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Upload report files as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-report
+        path: |
+          *.html
+          *.js
+          *.css
+          *.json
+        retention-days: 90

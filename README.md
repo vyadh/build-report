@@ -4,6 +4,8 @@ An experiment in Copilot agent mode to build a report, with a bunch of refactori
 
 No frameworks, no libraries, just plain HTML/CSS/JavaScript.
 
+Preview: [GitHub Pages](https://vyadh.github.io/build-report)
+
 # Future
 
 ## Duration
