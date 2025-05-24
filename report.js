@@ -75,48 +75,28 @@ const renderReport = (project, build) => {
 
     updateElement('build-system', project?.build_system);
 
-    // Update protection badge based on protection status and whether it's the default branch
-    if (protected_branch !== undefined) {
-        // For default branch that's unprotected, use warning style
-        if (build?.ref_default === ref_name && !protected_branch) {
-            const protectionBadge = document.getElementById('protection');
-            if (protectionBadge) {
-                protectionBadge.style.display = '';
-                protectionBadge.textContent = 'Unprotected';
-                protectionBadge.className = 'badge badge-warning';
-            }
-        } else {
-            // For other branches, use the standard styling
-            updateBadge(
-                'protection',
-                protected_branch,
-                'Protected',
-                'badge-success',
-                'Unprotected',
-                'badge-subtle'
-            );
-        }
+    // Show default branch badge if this is the default branch
+    const isDefaultBranch = build?.ref_default === ref_name;
+    if (isDefaultBranch) {
+        updateBadge('default', 'Default', 'badge-subtle');
     }
 
-    // Show default branch badge if this is the default branch
-    if (build?.ref_default === ref_name) {
-        const defaultBadge = document.getElementById('default');
-        if (defaultBadge) {
-            defaultBadge.style.display = '';
-            defaultBadge.className = 'badge badge-subtle';
+    // Update protection badge based on protection status and whether it's the default branch
+    if (protected_branch === true) {
+        updateBadge('protection', 'Protected', 'badge-success');
+    } else if (protected_branch === false) {
+        if (isDefaultBranch) {
+            updateBadge('protection', 'Unprotected', 'badge-warning');
+        } else {
+            updateBadge('protection', 'Unprotected', 'badge-subtle');
         }
     }
 
     // Update maturity badge if snapshot info exists
-    if (snapshot !== undefined) {
-        updateBadge(
-            'project-maturity',
-            !snapshot,
-            'Release',
-            'badge-success',
-            'Snapshot',
-            'badge-secondary'
-        );
+    if (snapshot === true) {
+        updateBadge( 'project-maturity', 'Snapshot', 'badge-secondary');
+    } else if (snapshot === false) {
+        updateBadge( 'project-maturity', 'Release', 'badge-success');
     }
 
     // Delivery information
@@ -214,13 +194,13 @@ const updateElement = (id, value, hrefTemplate = null) => {
     if (hrefTemplate) el.href = hrefTemplate;
 };
 
-const updateBadge = (id, isActive, activeText, activeClass, inactiveText, inactiveClass) => {
+const updateBadge = (id, text, styleClass) => {
     const badge = document.getElementById(id);
     if (!badge) return;
 
     badge.style.display = '';
-    badge.textContent = isActive ? activeText : inactiveText;
-    badge.classList.add(isActive ? activeClass : inactiveClass);
+    badge.textContent = text;
+    badge.classList.add(styleClass);
 };
 
 const updateInfoItem = (id, value, condition) => {
