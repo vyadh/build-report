@@ -83,7 +83,7 @@ const renderReport = (project, build) => {
 
     if (project?.delivery && deliveryInfoList) {
         // Clear any existing items
-        deliveryInfoList.innerHTML = ""
+        deliveryInfoList.replaceChildren()
 
         const { deploy } = project.delivery ?? {}
         const { kubernetes } = deploy ?? {}
@@ -101,7 +101,7 @@ const renderReport = (project, build) => {
     if (languages.length) {
         const langContainer = document.getElementById("languages")
         if (langContainer) {
-            langContainer.innerHTML = ""
+            langContainer.replaceChildren()
             languages.forEach(lang => {
                 const tagSpan = document.createElement("span")
                 tagSpan.className = "tag"
@@ -121,7 +121,7 @@ const renderReport = (project, build) => {
     if (assets?.length > 0) {
         const assetsContainer = document.querySelector(".assets-list")
         if (assetsContainer) {
-            assetsContainer.innerHTML = ""
+            assetsContainer.replaceChildren()
             assets.map(getAsset).forEach(asset => {
                 assetsContainer.appendChild(createAssetElement(asset))
             })
@@ -266,13 +266,34 @@ const createAssetElement = ({ name, type, url, icon = "file_present" }) => {
     assetItem.className = "asset-item"
     assetItem.target = "_blank"
 
-    assetItem.innerHTML = `
-        <div class="asset-icon"><span class="material-symbols-rounded">${icon}</span></div>
-        <div class="asset-info">
-            <div class="asset-name">${name}</div>
-            <div class="asset-type">${type}</div>
-        </div>
-    `
+    // Create icon element
+    const iconDiv = document.createElement("div")
+    iconDiv.className = "asset-icon"
+
+    const iconSpan = document.createElement("span")
+    iconSpan.className = "material-symbols-rounded"
+    iconSpan.textContent = icon
+    iconDiv.appendChild(iconSpan)
+
+    // Create info container
+    const infoDiv = document.createElement("div")
+    infoDiv.className = "asset-info"
+
+    // Create and add name element
+    const nameDiv = document.createElement("div")
+    nameDiv.className = "asset-name"
+    nameDiv.textContent = name
+    infoDiv.appendChild(nameDiv)
+
+    // Create and add type element
+    const typeDiv = document.createElement("div")
+    typeDiv.className = "asset-type"
+    typeDiv.textContent = type
+    infoDiv.appendChild(typeDiv)
+
+    // Append all elements to the asset item
+    assetItem.appendChild(iconDiv)
+    assetItem.appendChild(infoDiv)
 
     return assetItem
 }
