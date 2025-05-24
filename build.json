@@ -3,7 +3,7 @@
     "source": "github",
     "owner": "myorg",
     "repository": "dpe-hello-world",
-    "production_process": true,
+    "production_process": false,
     "ref": "refs/heads/main",
     "ref_name": "main",
     "ref_default": "main",
