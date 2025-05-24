@@ -1,22 +1,36 @@
-An experiment in Copilot agent mode to build a report.
+# GitHub Actions Project / Build Report
 
-# Ideas to add
+An experiment in Copilot agent mode to build a report, with a bunch of refactoring and cleanups to make it somewhat understandable.
 
-duration
-- can use the fields: created_at, updated_at, run_started_at on a workflow run/attempt?
-    "duration": "1h", run_started_at 
+No frameworks, no libraries, just plain HTML/CSS/JavaScript.
 
-trigger
-- "push|pull_request|schedule|manual"
+# Future
 
-release notes
+## Duration
 
-open security stats, including numbers at each severity level
+Duration of build. Looks like in GitHub Actions, the duration needs to be calculated.
+- See: created_at, updated_at, run_started_at on a workflow run/attempt?
+- Format as HH:MM:SS or similar.
+
+## Trigger
+
+push | pull_request | schedule | manual
+
+## Release Notes
+
+Not as part of this report, but would be nice to have a link from the version number.
+
+## Security
+
+Security stats, including the issues open at each severity level.
 - code scanning
 - vulnerability alerts
 - secrets scanning
 
-tests pass/fail
-asset links to both GitHub and Artifactory
-Repo labels
-status check results
+## Other
+
+- Tests pass/fail (probably not - if the tests fail, we probably wouldn't publish this report)
+- Coverage, or better, a link to the coverage report
+- Asset links to both GitHub and Package Registry
+- Read any relevant repo labels
+- Report on status check results
