@@ -115,7 +115,7 @@ const renderReport = (project, build) => {
     const { references } = project ?? {};
     updateElement('issue-tracking', references?.jira, generateJiraLink(references?.jira));
     updateElement('change-management', references?.servicenow, generateServiceNowLink(references?.servicenow));
-    updateElement('team-city', references?.team_city, generateTeamCityLink(references?.team_city));
+    updateElement('teamcity', references?.teamcity, generateTeamCityLink(references?.teamcity));
 
     // Assets
     if (assets?.length > 0) {
@@ -191,6 +191,13 @@ const updateBadges = (build, project) => {
         updateBadge('release-maturity', 'Final', 'badge-success');
     }
 
+    // Update maturity badge if snapshot info exists
+    if (snapshot === true) {
+        updateBadge('build-maturity', 'Snapshot', pre_release === false ? 'badge-danger' : 'badge-secondary');
+    } else if (snapshot === false) {
+        updateBadge('build-maturity', 'Release', 'badge-success');
+    }
+
     // Show default branch badge if this is the default branch
     if (isDefaultBranch) {
         updateBadge('default-branch', 'Default', 'badge-subtle');
@@ -207,11 +214,10 @@ const updateBadges = (build, project) => {
         }
     }
 
-    // Update maturity badge if snapshot info exists
-    if (snapshot === true) {
-        updateBadge('build-maturity', 'Snapshot', pre_release === false ? 'badge-danger' : 'badge-secondary');
-    } else if (snapshot === false) {
-        updateBadge('build-maturity', 'Release', 'badge-success');
+    // Check if application IDIP is missing or empty
+    const idip = project?.application?.idip;
+    if (production_process == true && (!idip || idip.trim() === '')) {
+        updateBadge('idip-presence', 'Missing', 'badge-warning');
     }
 };
 

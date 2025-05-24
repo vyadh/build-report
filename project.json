@@ -42,7 +42,7 @@
     "references": {
       "servicenow": "HLO",
       "jira": "DPE",
-      "team_city": "Apps_DPE_HelloWorld"
+      "teamcity": "Apps_DPE_HelloWorld"
     }
   }
 }
