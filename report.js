@@ -14,60 +14,61 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 })
 
-// Function to render the report using the separate data sources
 const renderReport = (project, build) => {
-    // Project information
-    updateElement("project-id", project?.id)
-    updateElement("project-name", project?.name)
-    updateElement("project-description", project?.description)
-    updateElement("project-type", project?.type)
+    populateHeader(project)
+    populateBuildHighlights(project, build)
+    populateBuild(project, build)
+    populateProject(project, build)
+    populateDelivery(project, build)
+    populateIntegration(project, build)
+    populateAssets(build.assets)
 
-    // Application information
-    const { application } = project ?? {}
-    if (application) {
-        updateElement("application-id", application.id)
-        updateElement("application-name", application.name)
-        updateElement("application-idip", application.idip)
-    }
+    updateBadges(build, project)
+}
 
-    // Team information
-    const { team } = project ?? {}
-    if (team) {
-        updateElement("team-code", team.code, generateGitHubLink("team", build, project))
-        updateElement("team-slug", team.slug)
-    }
+const populateHeader = (project) => {
+    updateElement("project-name", project.name)
+    updateElement("project-description", project.description)
+    updateElement("project-type", project.type)
+    updateElement("application-name", project.application?.name)
+}
 
-    // Organization and repository
-    updateElement("organisation", build?.owner, generateGitHubLink("organisation", build, project))
-    updateElement("repository", build?.repository, generateGitHubLink("repository", build, project))
+const populateBuildHighlights = (project, build) => {
+    updateElement("version", build.version, generateGitHubLink("version", build, project))
+    updateElement("build-reference",
+        formatBuildReference(build.run_id, build.run_number, build.run_attempt),
+        generateGitHubLink("build-reference", build, project))
+    updateElement("branch", build.ref_name)
+}
 
-    // Build information
-    const { run_id, run_number, run_attempt, workflow_ref, version, ref_name, revision, actor, runner, captured_at, assets } = build ?? {}
+const populateBuild = (project, build) => {
+    updateElement("organisation", build.owner, generateGitHubLink("organisation", build, project))
+    updateElement("repository", build.repository, generateGitHubLink("repository", build, project))
+    updateElement("revision", build.revision.substring(0, 7), generateGitHubLink("commit", build, project))
+    updateElement("actor", build.actor)
+    updateElement("runner", build.runner)
+    updateElement("timestamp", new Date(build.captured_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "long" }))
+    updateElement("build-system", project.build_system)
 
-    updateElement("branch", ref_name)
-    updateElement("actor", actor)
-    updateElement("runner", runner)
-    updateElement("build-reference", formatBuildReference(run_id, run_number, run_attempt), generateGitHubLink("build-reference", build, project))
-    updateElement("timestamp", new Date(captured_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "long" }))
-    updateElement("build-system", project?.build_system)
-
-    if (version) {
-        updateElement("version", version, generateGitHubLink("version", build, project))
-    }
-    if (revision) {
-        updateElement("revision", revision.substring(0, 7), generateGitHubLink("commit", build, project))
-    }
-
-    const workflow = extractWorkflowName(workflow_ref)
+    const workflow = extractWorkflowName(build.workflow_ref)
     if (workflow) {
         updateElement("workflow", workflow, generateGitHubLink("workflow", build, project))
     }
+}
 
-    updateBadges(build, project)
+const populateProject = (project, build) => {
+    updateElement("project-id", project.id)
+    updateElement("application-id", project.application?.id)
+    updateElement("team-code", project.team?.code, generateGitHubLink("team", build, project))
+    updateElement("team-slug", project.team?.slug)
 
-    // Delivery information
-    const deliveryInfoList = document.getElementById("delivery-info-list")
-    if (project?.delivery && deliveryInfoList) {
+    populateLanguages(project)
+}
+
+const populateDelivery = (project, build) => {
+    if (project.delivery) {
+        const deliveryInfoList = document.getElementById("delivery-info-list")
+
         // Clear any existing items
         deliveryInfoList.replaceChildren()
 
@@ -81,35 +82,15 @@ const renderReport = (project, build) => {
 
         document.getElementById("delivery-section").style.display = ""
     }
+}
 
-    // Handle languages
-    const languages = project?.languages ?? []
-    if (languages.length) {
-        const langContainer = document.getElementById("languages")
-        if (langContainer) {
-            langContainer.replaceChildren()
-            languages.forEach(lang => {
-                langContainer.appendChild(createElement("span", "tag", lang))
-            })
-        }
-    }
-
-    // Integration information
+const populateIntegration = (project, build) => {
     const { references } = project ?? {}
+
     updateElement("issue-tracking", references?.jira, generateJiraLink(references?.jira))
     updateElement("change-management", references?.servicenow, generateServiceNowLink(references?.servicenow))
     updateElement("teamcity", references?.teamcity, generateTeamCityLink(references?.teamcity))
-
-    // Assets
-    if (assets?.length > 0) {
-        const assetsContainer = document.querySelector(".assets-list")
-        if (assetsContainer) {
-            assetsContainer.replaceChildren()
-            assets.map(getAsset).forEach(asset => {
-                assetsContainer.appendChild(createAssetElement(asset))
-            })
-        }
-    }
+    updateElement("application-idip", project.application.idip)
 }
 
 const generateGitHubLink = (type, build, project) => {
@@ -117,26 +98,21 @@ const generateGitHubLink = (type, build, project) => {
 
     switch (type) {
         case "organisation":
-            return owner ? `https://github.com/${owner}` : null
+            return `https://github.com/${owner}`
         case "repository":
-            return owner && repository ? `https://github.com/${owner}/${repository}` : null
+            return `https://github.com/${owner}/${repository}`
         case "version":
-            return owner && repository && version ?
-                `https://github.com/${owner}/${repository}/releases/tag/v${version}` : null
+            return version ? `https://github.com/${owner}/${repository}/releases/tag/v${version}` : null
         case "build-reference":
             const buildRef = formatBuildReference(run_id, run_number, run_attempt)
-            return owner && repository && buildRef ?
-                `https://github.com/${owner}/${repository}/actions/runs/${buildRef.split(".")[0]}` : null
+            return buildRef ? `https://github.com/${owner}/${repository}/actions/runs/${buildRef.split(".")[0]}` : null
         case "commit":
-            return owner && repository && revision ?
-                `https://github.com/${owner}/${repository}/commit/${revision}` : null
+            return `https://github.com/${owner}/${repository}/commit/${revision}`
         case "workflow":
             const workflow = extractWorkflowName(workflow_ref)
-            return owner && repository && workflow ?
-                `https://github.com/${owner}/${repository}/blob/main/.github/workflows/${workflow}` : null
+            return workflow ? `https://github.com/${owner}/${repository}/blob/main/.github/workflows/${workflow}` : null
         case "team":
-            return owner && project?.team?.slug ?
-                `https://github.com/orgs/${owner}/teams/${project.team.slug}` : null
+            return project.team?.slug ? `https://github.com/orgs/${owner}/teams/${project.team.slug}` : null
         default:
             return null
     }
@@ -145,15 +121,6 @@ const generateGitHubLink = (type, build, project) => {
 const generateJiraLink = data => data ? `https://jira.example.com/projects/${data}` : null
 const generateServiceNowLink = data => data ? `https://servicenow.example.com/item/${data}` : null
 const generateTeamCityLink = data => data ? `https://teamcity.example.com/project/${data}` : null
-
-const updateElement = (id, value, hrefTemplate = null) => {
-    if (!value) return
-    const el = document.getElementById(id)
-    if (!el) return
-
-    el.textContent = value
-    if (hrefTemplate) el.href = hrefTemplate
-}
 
 // Function to handle all badge updates based on build state
 const updateBadges = (build, project) => {
@@ -202,7 +169,7 @@ const updateBadges = (build, project) => {
     }
 
     // Check if application IDIP is missing or empty
-    const idip = project?.application?.idip
+    const idip = project.application?.idip
     if (production_process == true && (!idip || idip.trim() === "")) {
         updateBadge("idip-presence", "Missing", "badge-warning")
     }
@@ -217,24 +184,29 @@ const updateBadge = (id, text, styleClass) => {
     badge.classList.add(styleClass)
 }
 
-const updateInfoItem = (id, value, condition) => {
-    const item = document.getElementById(id)?.closest(".info-item")
-    if (condition) {
-        updateElement(id, value)
-        if (item) item.style.display = ""
-    } else {
-        if (item) item.style.display = "none"
+const populateLanguages = (project) => {
+    const languages = project.languages ?? []
+    if (languages.length) {
+        const langContainer = document.getElementById("languages")
+        if (langContainer) {
+            langContainer.replaceChildren()
+            languages.forEach(lang => {
+                langContainer.appendChild(createElement("span", "tag", lang))
+            })
+        }
     }
 }
 
-const addInfoItem = (container, id, label, value) => {
-    if (!value) return
-
-    const itemLabel = createElement("div", "item-label", label)
-    const itemValue = createElement("div", "item-value", value, { id })
-    const infoItem = createContainer("info-item", [itemLabel, itemValue])
-
-    container.appendChild(infoItem)
+const populateAssets = (assets) => {
+    if (assets?.length > 0) {
+        const assetsContainer = document.querySelector(".assets-list")
+        if (assetsContainer) {
+            assetsContainer.replaceChildren()
+            assets.map(getAsset).forEach(asset => {
+                assetsContainer.appendChild(createAssetElement(asset))
+            })
+        }
+    }
 }
 
 const createAssetElement = ({ name, type, url, icon = "file_present" }) => {
@@ -303,7 +275,28 @@ const extractWorkflowName = workflowRef => {
 const formatBuildReference = (runId, runNumber, runAttempt) =>
     runId ? `${runId}.${runNumber}.${runAttempt}` : null
 
-// DOM helper functions
+
+// DOM Helper Functions
+
+const addInfoItem = (container, id, label, value) => {
+    if (!value) return
+
+    const itemLabel = createElement("div", "item-label", label)
+    const itemValue = createElement("div", "item-value", value, { id })
+    const infoItem = createContainer("info-item", [itemLabel, itemValue])
+
+    container.appendChild(infoItem)
+}
+
+const updateElement = (id, value, hrefTemplate = null) => {
+    if (!value) return
+    const el = document.getElementById(id)
+    if (!el) return
+
+    el.textContent = value
+    if (hrefTemplate) el.href = hrefTemplate
+}
+
 const createElement = (type, className, textContent, attributes = {}) => {
     const element = document.createElement(type)
     element.className = className
